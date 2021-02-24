@@ -1,0 +1,16 @@
+{
+
+  "expo": {
+    "icon": "assets/5 cauenne.png",
+    "name": "ObjEBP",
+    "slug": "objebp",
+    "version": "1.2.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+
+      "package": "expo.rn.ebp"
+    }
+  }
+}
