@@ -7,10 +7,8 @@ import {addRecord, getUrl, sendPhoto} from '../Share/func';
 import { CommonActions } from '@react-navigation/native';
 import {Data, SignDataProps} from "../Navigation/NavTypes";
 import { useEffect, useState } from "react";
-import NetInfo from "@react-native-community/netinfo";
+import * as NetworkExpo from 'expo-network';
 import {ModalActivityIndicator} from "../Share/components";
-
-type gostType = {id: number, name: string}[]
 
 const gostTypes = [
 	{ id: 1, name: 'Предупреждающие'},
@@ -27,17 +25,21 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const [tiporaz, setTiporaz] = useState<number | string>(0);
 	const [krepl, setKrepl] = useState< number | string >(0);
 	const [gostType, setGostType] = useState(1);
-	const [gostTypeSource, setGostTypeSource] = useState<gostType>(gostTypes);
+	const gostTypeSource = gostTypes;
 	const [gostSource, setGostSource] = useState<any[]>([]);
 	const [tiporazSource, setTiporazSource] = useState<string[]>([]);
 	const [kreplSource, setKreplSource] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
 	const Network = async (): Promise<boolean> => {
-		let check: boolean = false;
-		await NetInfo.fetch().then(state => {
-			check = state.isConnected;
-		});
+		let check: undefined | boolean = false;
+		await NetworkExpo.getNetworkStateAsync().then((state: NetworkExpo.NetworkState) => {
+			check = state.isConnected
+				 && state.isInternetReachable
+				 && (state.type == NetworkExpo.NetworkStateType.CELLULAR
+					|| state.type == NetworkExpo.NetworkStateType.WIFI
+					|| state.type == NetworkExpo.NetworkStateType.WIMAX)
+	});
 		return check;
 	}
 
@@ -49,7 +51,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 
 	},[])
 
-	const next = (responseJson: any) => {
+	const next = () => {
 		setLoading(false);
 		Data.gps = undefined;
 		Data.imageBefore = undefined;
@@ -63,9 +65,13 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 		]);
 	}
 
+	const saveRecord = async (body: any) => {
+		let saveBefore = Data.imageBefore;
+		let saveAfter = Data.imageAfter;
+		await addRecord('znak', body, saveBefore, saveAfter)
+	}
+
 	const sendData = () => {
-
-
 
 		let body =
 			'Token=' + Data.Token + '&' +
@@ -100,6 +106,26 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 				if (
 					state
 				) {
+					setTimeout(() => {
+						setLoading(false)
+						saveRecord(body).then(() => {
+							Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+								{
+									text: 'Вернуться на главный экран',
+									onPress: () => navigation.dispatch(
+										CommonActions.reset({
+											index: 5,
+											routes: [
+												{
+													name: 'Root'
+												}
+											]
+										})
+									)
+								}
+							])
+						});
+					}, 10000)
 					fetch(url, {
 						method: 'post',
 						headers: {
@@ -112,7 +138,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-								sendPhoto(responseJson.id, Data, Data.Token, "znak").then(() => next(responseJson));
+								sendPhoto(responseJson.id, Data, Data.Token, "znak").then(() => next());
 							} else {
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
 									{
@@ -140,12 +166,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 						})
 				}
 				else {
-					const saveRecord = async () => {
-						let saveBefore = Data.imageBefore;
-						let saveAfter = Data.imageAfter;
-						await addRecord('znak', body, saveBefore, saveAfter)
-					}
-					saveRecord().then(() => {
+					saveRecord(body).then(() => {
 						Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
 							{
 								text: 'Вернуться на главный экран',
