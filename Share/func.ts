@@ -3,11 +3,7 @@
 import { Alert } from 'react-native';
 import DB from "./storage";
 import * as FileSystem from 'expo-file-system';
-import {Data, GPS} from "../Navigation/NavTypes";
-import * as TaskManager from "expo-task-manager";
-import * as Location from "expo-location";
-import * as Permissions from 'expo-permissions';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const getUrl = (action: any) => {
 

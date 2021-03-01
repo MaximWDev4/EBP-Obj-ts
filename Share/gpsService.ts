@@ -1,6 +1,6 @@
 import {GPS} from "../Navigation/NavTypes";
 import * as Location from "expo-location";
-import * as Permissions from 'expo-permissions'
+import {store} from "../Store";
 export class GpsService {
     min: GPS|undefined = undefined;
     Gps: GPS[]|undefined = [];
@@ -8,20 +8,28 @@ export class GpsService {
     p = false;
     watchLocation: { remove(): void } | undefined;
 
+    SetGps = (v: GPS | undefined) => {
+        // if (v) {
+            store.dispatch({type: 'gps/set', payload: v})
+        // } else {
+        //     store.dispatch({type: 'gps/clear', payload: undefined})
+        // }
+    }
+
     constructor() {
         Location.getPermissionsAsync().then( (a) => {
-            if (a.granted) {
+            if (a.android?.scope == 'fine' || a.android?.scope == 'coarse') {
                 this.p = true;
             } else {
                 Location.requestPermissionsAsync().then((e) =>{
-                    this.p = e.granted
+                    this.p = (e.android?.scope == 'fine' || e.android?.scope == 'coarse')
                 })
             }
         })
     }
 
     async start() {
-        const options: Location.LocationTaskOptions = {accuracy: Location.Accuracy.BestForNavigation}
+        const options: Location.LocationTaskOptions = {accuracy: Location.Accuracy.BestForNavigation, timeInterval: 500}
         this.watchLocation = await Location.watchPositionAsync(options, (opts) => {
             if (opts) {
                 if (opts.coords.accuracy) {
@@ -30,6 +38,8 @@ export class GpsService {
                     }
                     this.Gps?.push(opts);
                 }
+                this.SetGps(this.Gps ? this.Gps[this.Gps?.length] : {coords: {latitude: 10, accuracy: 100, longitude:10, speed: 0, heading: 0, altitude: 0}})
+                // SetGps(this.Gps? this.Gps[this.Gps.length] : undefined);
             }});
         // await Permissions.askAsync(Permissions.LOCATION)
         // this.min = undefined;
@@ -94,24 +104,24 @@ export class GpsService {
 
         if (this.Gps) {
             this.Gps.map((i) => {
-                if (Result.coords.accuracy && i.coords.accuracy && Result.coords.accuracy > i.coords.accuracy) {
+                if (Result.coords && i.coords && Result.coords.accuracy && i.coords.accuracy && Result.coords.accuracy > i.coords.accuracy) {
                     Result = i;
                 }
             });
             this.Gps.map((item) => {
                 // let prevItem = this.Gps[i - 1];
-                if (Result.coords.latitude && Result.coords.latitude && item.coords.latitude && item.coords.longitude && item.coords.accuracy) {
+                if (Result.coords && item.coords && Result.coords.latitude && Result.coords.latitude && item.coords.latitude && item.coords.longitude && item.coords.accuracy) {
                     SLat += (Result.coords.latitude - item.coords.latitude) / (item.coords.accuracy);
                     SLon += (Result.coords.latitude - item.coords.longitude) / (item.coords.accuracy);
                     // console.log(prevItem.coords.latitude + ' - ' + item.coords.latitude + ') / ((' + item.coords.accuracy + ' + ' + prevItem.coords.accuracy + ') / 2) = ' + SLat);
                 }
             });
-            if (Result.coords.latitude && Result.coords.longitude) {
+            if (Result.coords && Result.coords.latitude && Result.coords.longitude) {
                 // console.log((SLat / n) + this.Gps[0].coords.latitude);
                 Result.coords.latitude = Result.coords.latitude + (SLat / n);
                 Result.coords.longitude = Result.coords.longitude + (SLon / n);
                 this.Gps.map((item) => {
-                    if (item.coords.accuracy) {
+                    if (item.coords && item.coords.accuracy) {
                         delLat += item.coords.accuracy;
                         delLon += item.coords.accuracy;
                     }
@@ -119,7 +129,7 @@ export class GpsService {
                 // console.log((((Math.sqrt((delLat / n)) + Math.sqrt((delLon / n))) / 2)) / Math.sqrt(n));
                 Result.coords.accuracy = (((Math.sqrt((delLat / n)) + Math.sqrt((delLon / n))) / 2)) + Math.abs(n - 20)
 
-                if (this.Gps[0].coords.accuracy) {
+                if (this.Gps[0].coords && this.Gps[0].coords.accuracy) {
                     if (Result) {
                         this.min = Result;
                     } else {
@@ -151,8 +161,6 @@ export class GpsService {
         this.watchLocation = undefined;
     }
 }
-
-import * as TaskManager from "expo-task-manager";
 
 
 // if (opts.data.locations) {

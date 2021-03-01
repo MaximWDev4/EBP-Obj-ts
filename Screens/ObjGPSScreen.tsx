@@ -1,62 +1,39 @@
 import * as React from 'react';
 import { Alert } from 'react-native';
-import * as TaskManager from 'expo-task-manager';
 import { useFocusEffect } from '@react-navigation/native';
 
 import {GPS, Data, ObjDataProps} from "../Navigation/NavTypes";
 import {useCallback, useState} from "react";
 import {al, RenderGPSView} from "../Share/screensAPI";
-import {GpsService} from "../Share/gpsService";
+import {store} from "../Store";
 
 
 export default function ObjGPSScreen ({route, navigation}: ObjDataProps) {
 	const Data: Data = route.params;
 	// const gpsService = Data.gpsService;
-	const gpsService = new GpsService();
 	const [loading, setLoading] = useState(false);
-	const [gps, setGps] = useState<GPS | undefined>(undefined);
+	// const [gps, setGps] = useState<GPS | undefined>(undefined);
 	const [rAcc, setRacc] = useState<number>(al.high); // required accuracy
 	const [min, setMin] = useState<GPS>();
-	let interval: any = undefined;
-	const asyncFunction = async () => {
-		if ((typeof gpsService.watchLocation) === 'undefined') {
-			await gpsService.start();
-			if (typeof interval === 'undefined') {
-				interval = setInterval(() => {
-					if (gpsService.getGps) {
-						setGps(gpsService.getGps);
-					}
-					if (gpsService.getMin) {
-						setMin( gpsService.getMin);
-					}
-				}, 2000);
-			}
-		} else {
-			if (typeof interval === 'undefined') {
-				interval = setInterval(() => {
-					if (gpsService.getGps) {
-						setGps(gpsService.getGps);
-					}
-					if (gpsService.getMin) {
-						setMin(gpsService.getMin);
-					}
-				}, 2000);
-			}
+	let gps: GPS = store.getState().gps;
+	const unsubscribe = store.subscribe(() => {
+			setMin(store.getState().gps);
+			gps = store.getState().gps;
 		}
-	}
-
+	)
 	useFocusEffect(
 		useCallback(() => {
-			asyncFunction();
+
+			// asyncFunction();
 			return async () => {
-				await TaskManager.unregisterAllTasksAsync();
-				if (typeof gpsService.watchLocation !== 'undefined') {
-					gpsService.killWatch();
-				}
-				clearInterval(interval);
-				interval = undefined;
+				unsubscribe();
+				// if (typeof gpsService.watchLocation !== 'undefined') {
+				// 	gpsService.killWatch();
+				// }
+				// clearInterval(interval);
+				// interval = undefined;
 				setMin(undefined);
-				gpsService.setDefault();
+				// gpsService.setDefault();
 			}
 		}, [])
 	);
@@ -79,10 +56,10 @@ export default function ObjGPSScreen ({route, navigation}: ObjDataProps) {
 	}
 
 	let acc = '---';
-	if (gps?.coords?.accuracy) {
+	if (gps && gps.coords?.accuracy) {
 		acc = gps.coords.accuracy.toFixed(2);
 	}
 
-	return RenderGPSView(loading, acc, rAcc, min, setMin, setRacc, setLoading, setGps, next)
+	return RenderGPSView(loading, acc, rAcc, min, setMin, setRacc, setLoading, next)
 
 }

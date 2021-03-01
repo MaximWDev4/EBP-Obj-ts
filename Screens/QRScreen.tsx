@@ -13,7 +13,7 @@ import {useEffect} from "react";
 
 export default function QRScreen ({route, navigation}: SignDataProps) {
 
-	const Data = route.params;
+	const Data = {...route.params};
 
    useEffect( () => {
      		getPermissionsAsync().then();
@@ -80,7 +80,7 @@ export default function QRScreen ({route, navigation}: SignDataProps) {
 	}
 
 	const getPermissionsAsync = async () => {
-		const { status } = await Permissions.askAsync(Permissions.CAMERA)
+		const { status } = (await Permissions.askAsync(Permissions.CAMERA)).permissions
 	};
 
 	 const next = async(data: string) => {

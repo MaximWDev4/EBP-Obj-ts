@@ -30,7 +30,7 @@ export function WelcomeScreen({navigation, route}: MainDataProps) {
 	}
 
   const _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    let { status } = (await Permissions.askAsync(Permissions.LOCATION)).permissions;
 
     if (status !== 'granted') {
       setErrorMessage('Permission to access location was denied')

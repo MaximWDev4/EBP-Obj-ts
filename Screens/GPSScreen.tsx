@@ -4,7 +4,6 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { Alert } from 'react-native';
 
 import * as TaskManager from 'expo-task-manager';
-import * as Location from "expo-location";
 
 import {SignDataProps, GPS, Data} from "../Navigation/NavTypes";
 import {useCallback, useState} from "react";
@@ -16,7 +15,7 @@ import {GpsService} from "../Share/gpsService";
 export default function GPSScreen ({route, navigation}: SignDataProps) {
 	const Data: Data = route.params;
 	// const gpsService = Data.gpsService;
-	const gpsService = new GpsService();
+	const gpsService = GpsService.prototype;
 	const [loading, setLoading] = useState(false);
 	const [gps, setGps] = useState<GPS | undefined>(undefined);
 	const [rAcc, setRacc] = useState<number>(al.high); // required accuracy
@@ -82,7 +81,7 @@ export default function GPSScreen ({route, navigation}: SignDataProps) {
 		acc = gps.coords.accuracy.toFixed(2);
 	}
 
-	return RenderGPSView(loading, acc, rAcc, min, setMin, setRacc, setLoading, setGps, next)
+	return RenderGPSView(loading, acc, rAcc, min, setMin, setRacc, setLoading, next)
 
 }
 

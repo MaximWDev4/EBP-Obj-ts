@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {GestureResponderEvent, Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import * as Permissions from 'expo-permissions';
 import {Data, ObjDataProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
@@ -26,9 +26,9 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
     }, [])
 
     async function askPermission() {
-        let p1 = await Permissions.getAsync("camera");
+        let p1 = (await Permissions.getAsync("camera")).permissions;
         if (!p1.granted) {
-            const {status} = await Permissions.askAsync(Permissions.CAMERA);
+            const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
             setHasPermission(status === 'granted');
         } else {
             setHasPermission(true);

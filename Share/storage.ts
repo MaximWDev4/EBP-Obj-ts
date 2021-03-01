@@ -1,6 +1,5 @@
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from "expo-file-system";
-import {Data} from "../Navigation/NavTypes";
 
 export interface Props {
 	db: any

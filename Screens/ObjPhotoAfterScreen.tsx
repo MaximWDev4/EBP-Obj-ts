@@ -33,9 +33,9 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
     }, [])
 
     async function askPermission() {
-        let p1 = await Permissions.getAsync("camera");
+        let p1 = (await Permissions.getAsync("camera")).permissions;
         if (!p1.granted) {
-            const {status} = await Permissions.askAsync(Permissions.CAMERA);
+            const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
             setHasPermission(status === 'granted');
         } else {
             setHasPermission(true);

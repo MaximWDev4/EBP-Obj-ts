@@ -209,7 +209,6 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
  * @param minCallback - записсать минимальную полученную точность
  * @param rAccCallback - записать необходимую точность
  * @param loadingCallback - записать загружается ли
- * @param GpsCallback - записать результат текущего запроса gps
  * @param next - к следующему экрану
  * @constructor
  */
@@ -220,7 +219,6 @@ function RenderGPSView(loading: boolean,
                        minCallback: (min: GPS) => void,
                        rAccCallback: (rAcc: number) => void,
                        loadingCallback: (loading: boolean) => void,
-                       GpsCallback: (gps: GPS) => void,
                        next: () => void
                       ) {
     const macc = min?.coords.accuracy;
@@ -296,17 +294,6 @@ function RenderGPSView(loading: boolean,
 
                 </View>
                 <View style={{flex: 1}}>
-                {/*<View style={{flex: 1,}}>*/}
-                {/*    <Button title={`Уточнить расположение`} onPress={() => {*/}
-                {/*        gpsService.findMe(min, minCallback, rAcc, rAccCallback, loadingCallback,GpsCallback)}}>*/}
-                {/*    </Button>*/}
-                {/*</View>*/}
-                {/*<View style={{flex: 1,}}>*/}
-                {/*    <Button title={`Попробовать снова`} onPress={() => {*/}
-                {/*        recalibrateCallback()*/}
-                {/*    }}>*/}
-                {/*    </Button>*/}
-                {/*</View>*/}
                 <View style={{flex: 1,}}>
                     <MyButton style={{height: 50, backgroundColor: colors.gray, fontSize: 22}} title='Продолжить' onPress={() => {
                         if (macc || macc === 0){

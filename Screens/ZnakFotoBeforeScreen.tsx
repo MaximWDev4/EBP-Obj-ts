@@ -29,7 +29,7 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 
 	async function askPermission()
 	{
-		const {status} = await Permissions.askAsync(Permissions.CAMERA);
+		const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
 		setHasPermission(status === 'granted');
 	}
 
