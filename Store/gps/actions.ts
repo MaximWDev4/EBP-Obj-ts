@@ -1,6 +1,6 @@
 import {StoreGPS, gpsActionType, SET_GPS, CLEAR_GPS} from "../types"
 
-export function setGps(newGps: StoreGPS) : gpsActionType {
+export function setGps(newGps: StoreGPS[]) : gpsActionType {
     return {
         type: SET_GPS,
         payload: newGps,

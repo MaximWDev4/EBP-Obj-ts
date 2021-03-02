@@ -4,7 +4,7 @@ import {
     Button,
     FlatList, FlatListProps,
     GestureResponderEvent,
-    Image, ListRenderItem,
+    Image, ListRenderItem, Platform,
     ScrollView,
     StyleSheet,
     Text,
@@ -16,6 +16,7 @@ import {GpsService} from  "./gpsService";
 import Spinner from 'react-native-loading-spinner-overlay';
 import {GPS} from "../Navigation/NavTypes";
 import {CustomModalWindow, MyButton, TextStroke} from "./components";
+import * as Permissions from "expo-permissions";
 
 
 const colors = {
@@ -33,6 +34,7 @@ export const al = {
 }
 
 const pickImage = async (type: number, hasPermision: boolean, callback: (s: boolean, result: string) => any) => {
+
     if (hasPermision) {
         try {
             let result;
@@ -58,7 +60,9 @@ const pickImage = async (type: number, hasPermision: boolean, callback: (s: bool
         catch (e) {
             alert(e)
         }
-    } else Promise.reject("No permission").catch((e) => callback(false, e));
+    } else {
+        Promise.reject("No permission").catch((e) => callback(false, e));
+    }
 }
 
 // function IM (image: string, callback: (event: any) => void) {

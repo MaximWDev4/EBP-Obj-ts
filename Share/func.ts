@@ -1,8 +1,10 @@
 /// <reference path="../node.d.ts"/>
 
-import { Alert } from 'react-native';
+import {Alert, Platform} from 'react-native';
 import DB from "./storage";
 import * as FileSystem from 'expo-file-system';
+import * as Permissions from "expo-permissions";
+import * as ImagePicker from "expo-image-picker";
 
 
 const getUrl = (action: any) => {
@@ -58,6 +60,13 @@ const getUrl = (action: any) => {
 	return base;
 }
 
+async function askPermission() {
+	const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+	if (status !== 'granted') {
+		alert('Sorry, we need camera roll permissions to make this work!');
+	}
+	return status === 'granted'
+}
 
 const addRecord = async (type: 'znak' | 'obj', body: string, img_old?: string[], img_new?: string[]) => {
 	let db = new DB;
@@ -363,6 +372,6 @@ const sendPhoto = async (sid: string | number, record: any, Token: string, rout:
 // }
 
 export default getUrl;
-export { getUrl, sendZnakObj, sendPhoto, addRecord }
+export { getUrl, sendZnakObj, sendPhoto, addRecord, askPermission }
 
 //export getUrl, sendForm

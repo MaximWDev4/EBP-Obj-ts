@@ -3,37 +3,35 @@ import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import {GPS, Data, ObjDataProps} from "../Navigation/NavTypes";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {al, RenderGPSView} from "../Share/screensAPI";
 import {store} from "../Store";
+import {GpsService} from "../Share/gpsService";
 
 
 export default function ObjGPSScreen ({route, navigation}: ObjDataProps) {
 	const Data: Data = route.params;
-	// const gpsService = Data.gpsService;
 	const [loading, setLoading] = useState(false);
 	// const [gps, setGps] = useState<GPS | undefined>(undefined);
 	const [rAcc, setRacc] = useState<number>(al.high); // required accuracy
 	const [min, setMin] = useState<GPS>();
-	let gps: GPS = store.getState().gps;
+	let gps: GPS = store.getState().gps.s[0];
 	const unsubscribe = store.subscribe(() => {
-			setMin(store.getState().gps);
-			gps = store.getState().gps;
+			const storedGps = store.getState().gps.s
+			if (storedGps.length >= 1) {
+				setMin(GpsService.getMin(storedGps));
+				gps = GpsService.getGps(storedGps);
+			}
 		}
 	)
+	useEffect(() => {
+		return () => unsubscribe()
+	})
 	useFocusEffect(
 		useCallback(() => {
-
-			// asyncFunction();
 			return async () => {
 				unsubscribe();
-				// if (typeof gpsService.watchLocation !== 'undefined') {
-				// 	gpsService.killWatch();
-				// }
-				// clearInterval(interval);
-				// interval = undefined;
 				setMin(undefined);
-				// gpsService.setDefault();
 			}
 		}, [])
 	);

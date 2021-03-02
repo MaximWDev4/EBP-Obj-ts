@@ -52,14 +52,14 @@ export default function GPSScreen ({route, navigation}: SignDataProps) {
 		useCallback(() => {
 			asyncFunction();
 			return async () => {
-				await TaskManager.unregisterAllTasksAsync();
-				if (typeof gpsService.watchLocation !== 'undefined') {
-					gpsService.killWatch();
-				}
-				clearInterval(interval);
-				interval = undefined;
+				// await TaskManager.unregisterAllTasksAsync();
+				// if (typeof gpsService.watchLocation !== 'undefined') {
+				// 	gpsService.killWatch();
+				// }
+				// clearInterval(interval);
+				// interval = undefined;
 				setMin(undefined);
-				gpsService.setDefault();
+				// gpsService.setDefault();
 			}
 		}, [])
 	);

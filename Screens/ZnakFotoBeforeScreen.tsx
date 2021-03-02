@@ -5,6 +5,7 @@ import {Data, SignDataProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {pickImage, RenderPhotoView} from "../Share/screensAPI";
 import * as FileSystem from "expo-file-system";
+import {askPermission} from "../Share/func";
 
 
 export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps) {
@@ -14,7 +15,7 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 	const [images, setImages] = useState<string[]>([]);
 
 	useEffect(() => {
-		askPermission().then();
+		askPermission().then( stat => setHasPermission(stat));
 	}, [])
 
 	const deleteFoto = () => {
@@ -25,12 +26,6 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 			}
 			setImages([]);
 		}
-	}
-
-	async function askPermission()
-	{
-		const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
-		setHasPermission(status === 'granted');
 	}
 
 	const next = () => {
@@ -97,10 +92,11 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 		)
 	}
 
-	return (RenderPhotoView(images, next, IM,(type) => pickImage(type, hasPermission, (s, result) => {
+	return (RenderPhotoView(images, next, IM,(type) => pickImage(type, hasPermission, async (s, result) => {
 			if (s) {
 				setImages([result]);
 			} else {
+				await askPermission()
 				console.log(result);
 			}
 		})

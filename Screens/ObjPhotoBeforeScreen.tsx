@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import {pickImage, RenderPhotoView} from "../Share/screensAPI";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import {askPermission} from "../Share/func";
 
 export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) {
 
@@ -22,18 +23,8 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
                 }
             });
         }
-        askPermission().then();
+        askPermission().then( stat => setHasPermission(stat));
     }, [])
-
-    async function askPermission() {
-        let p1 = (await Permissions.getAsync("camera")).permissions;
-        if (!p1.granted) {
-            const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
-            setHasPermission(status === 'granted');
-        } else {
-            setHasPermission(true);
-        }
-    }
 
     const deleteFoto = async (id: number) => {
         let tempArr: string[];
@@ -114,7 +105,7 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
         )
     }
 
-    return (RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, (s, result) => {
+    return (RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, async (s, result) => {
                 if (s) {
                     try {
                         setImages([...images, result]);
@@ -122,6 +113,7 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
                         alert(e)
                     }
                 } else {
+                    await askPermission()
                     console.log(result);
                 }
             })

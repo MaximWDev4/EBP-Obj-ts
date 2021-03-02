@@ -30,7 +30,7 @@ export default function App() {
       ]);
       return true;
     };
-    gpsService.start();
+    gpsService.start().then();
     const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
         backAction

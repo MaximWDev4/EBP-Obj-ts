@@ -6,11 +6,12 @@ import {pickImage, RenderPhotoView} from "../Share/screensAPI";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import {askPermission} from "../Share/func";
 
 export default function ZnakFotoAfterScreen ({route, navigation}: SignDataProps) {
 
 	const Data = route.params;
-	const [hasPermission, setHasPermission] = useState(true);
+	const [hasPermission, setHasPermission] = useState(false);
 	const [images, setImages] = useState<string[]>([]);
 
 	useEffect(() => {
@@ -20,13 +21,8 @@ export default function ZnakFotoAfterScreen ({route, navigation}: SignDataProps)
 				setImages([pend_img[0].uri]);
 			}
 		});
-		askPermission().then();
+		askPermission().then( stat => setHasPermission(stat));
 	}, [])
-
-	async function askPermission() {
-		const {status} = (await Permissions.askAsync(Permissions.CAMERA)).permissions;
-		setHasPermission(status === 'granted');
-	}
 
 
 	const deleteFoto = () => {
@@ -108,10 +104,11 @@ export default function ZnakFotoAfterScreen ({route, navigation}: SignDataProps)
 		)
 	}
 
-	return (RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, (s, result) => {
+	return (RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, async (s, result) => {
 				if (s) {
 					setImages([result]);
 				} else {
+					await askPermission()
 					console.log(result);
 				}
 			})
