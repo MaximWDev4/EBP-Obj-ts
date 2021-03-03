@@ -5,8 +5,8 @@ export class GpsService {
     Gps: GPS[]|undefined = [];
     rAcc: number = 3;
     p = false;
+    canStart = false
     watchLocation: { remove(): void } | undefined;
-
     SetGps = (v: GPS[] | undefined) => {
         if (v) {
             store.dispatch({type: 'gps/set', payload: v})

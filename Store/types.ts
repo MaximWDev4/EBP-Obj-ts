@@ -21,7 +21,11 @@ interface gpsActionType2 {
     payload: StoreGPS[]
 }
 
-interface stateType {
+interface stateType1 {
+    token: string
+}
+
+interface stateType2 {
     s: {
         "coords": {
             "accuracy": number | null,
@@ -39,8 +43,13 @@ interface stateType {
 
 export const SET_GPS = 'gps/set';
 export const CLEAR_GPS ='gps/clear';
+export const SET_TOKEN = 'system/set-token';
+export const CLEAR_TOKEN ='system/clear-token';
 
-
+type systemActionType = {
+    type: string,
+    payload: string
+}
 type gpsActionType = gpsActionType1 | gpsActionType2;
 
-export {stateType, gpsActionType}
+export {stateType1, stateType2, systemActionType, gpsActionType}

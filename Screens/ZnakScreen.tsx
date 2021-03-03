@@ -9,6 +9,7 @@ import {Data, SignDataProps} from "../Navigation/NavTypes";
 import { useEffect, useState } from "react";
 import * as NetworkExpo from 'expo-network';
 import {ModalActivityIndicator} from "../Share/components";
+import {store} from "../Store";
 
 const gostTypes = [
 	{ id: 1, name: 'Предупреждающие'},
@@ -31,6 +32,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const [kreplSource, setKreplSource] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
+	const Token: string = store.getState().system.token;
 	const Network = async (): Promise<boolean> => {
 		let check: undefined | boolean = false;
 		await NetworkExpo.getNetworkStateAsync().then((state: NetworkExpo.NetworkState) => {
@@ -74,7 +76,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const sendData = () => {
 
 		let body =
-			'Token=' + Data.Token + '&' +
+			'Token=' + Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'QRDATA=' + Data.qrcode + '&' +
@@ -138,7 +140,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-								sendPhoto(responseJson.id, Data, Data.Token, "znak").then(() => next());
+								sendPhoto(responseJson.id, Data, "znak").then(() => next());
 							} else {
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
 									{
@@ -390,6 +392,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 			   );
 
 }
+
 
 
 const styles = StyleSheet.create({

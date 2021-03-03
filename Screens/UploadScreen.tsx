@@ -13,10 +13,11 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 import { Alert } from 'react-native';
 import { Image } from 'react-native';
-import {Data, MainDataProps} from "../Navigation/NavTypes";
+import { MainDataProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import DB from "../Share/storage";
 import {sendZnakObj, sendPhoto} from "../Share/func";
+import {store} from "../Store";
 
 
 
@@ -26,30 +27,44 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 	const [images, setImages] = useState<any[]>([]);
 	const [records, setRecords] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
-
 	useEffect(() => {
 			setLoading(true);
 			let timeout = setTimeout(() => {
 				setLoading(false);
 				alert('Ошибка загрузки')
 			}, 5000);
-
+			let errCodes: number[] = [];
 			try {
 				db.getZnaki(async (arr: any[]) => {
 
+					try {
 
-					setImages([]);
-					let tempArr: any[] = [];
-					arr.forEach((znak) => {
-						let img_old = JSON.parse(znak.img_old);
-						let img_new = JSON.parse(znak.img_new)
-						tempArr.push(img_old[0] !== '' ? img_old[0] : img_new[0]);
-					});
-					setImages(tempArr);
-					setRecords(arr);
-					console.log(records);
-					clearTimeout(timeout);
-					setLoading(false);
+						setImages([]);
+						let tempArr: any[] = [];
+						arr.forEach((znak) => {
+							let img_old;
+							let img_new;
+							try {
+								img_new = JSON.parse(znak.img_new);
+								img_old = JSON.parse(znak.img_old);
+							} catch (e) {
+								errCodes.push(znak.id);
+								console.log(e);
+							} finally {
+								tempArr.push(img_old && !!img_old[0] ? img_old[0] : img_new && !!img_new[0] ? img_new[0] : '' );
+							}
+						});
+						setImages(tempArr);
+						setRecords(arr);
+						console.log(records);
+
+					} catch (e) {
+						Alert.alert("Сбой при чтении фотографий", errCodes.join(', '))
+						console.log(e);
+					} finally {
+						clearTimeout(timeout);
+						setLoading(false);
+					}
 				});
 
 			} catch (e) {
@@ -63,10 +78,9 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 	useEffect(() => {
 		console.log(records)
 	}, [records])
-
-	const send = async (record: any, Token: string, callback: any) => {
+	const send = async (record: any, callback: any) => {
 		try {
-			let body = 'Token=' + Token + '&' + record.data + '&' + 'DATE' + record.dt;
+			let body = 'Token=' + '45'+store.getState().system.token + '&' + record.data + '&' + 'DATE' + record.dt;
 
 			let id = null;
 			const sent = await sendZnakObj(body, record.type == 'znak' ? 'save' : 'saveobj');
@@ -138,14 +152,14 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 		const sid: number = record.sid;
 
 		if (sid) {
-			await sendPhoto(sid, record, Data.Token, record.type).then((e) => {
+			await sendPhoto(sid, record, record.type).then((e) => {
 				if (e === 'success') { finish(true)} else {
 					alert(e);
 					finish(false)
 				}
 			});
 		} else {
-			await send(record, Data.Token, async (cid: any) => {
+			await send(record, async (cid: any) => {
 				record.sid = cid;
 				await SendInfo(record, finish)
 			});

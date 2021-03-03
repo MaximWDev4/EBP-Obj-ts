@@ -8,16 +8,12 @@ import {store} from "./Store";
 import {GpsService} from './Share/gpsService'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const fileName = FileSystem.documentDirectory + PERSISTENCE_KEY
-
+const fileUri = FileSystem.documentDirectory + 'Token';
 
 export default function App() {
   const gpsService = new GpsService();
-  const SetGps = console.log('Initial state: ', store.getState())
   const [isReady, setIsReady] = React.useState(false);
   const [initialState, setInitialState] = React.useState();
-  const unsubscribe = store.subscribe(() =>
-      console.log('State after dispatch: ', store.getState())
-  )
   useEffect(() => {
     const backAction = () => {
       Alert.alert("Уверены?", "Выйти из приложения", [
@@ -30,33 +26,53 @@ export default function App() {
       ]);
       return true;
     };
-    gpsService.start().then();
+    let unsubscribe2 = store.subscribe(() => {
+      if (store.getState().system.token !== '') {
+        gpsService.start().then();
+        unsubscribe2();
+      }
+    })
     const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
         backAction
     );
 
-    return () => { backHandler.remove(); unsubscribe(); }
+    return () => { backHandler.remove(); }
   }, []);
   useEffect(() => {
+    let asyncFunc = async () => {
+      const fileUri = FileSystem.documentDirectory + 'Token';
+      let p1;
+      try {
+        p1 = (await FileSystem.getInfoAsync(fileUri)).exists
+      }catch (e) {
+        Alert.alert(e);
+      }
+      // navigation.replace('Login');
+      if (p1) {
+        FileSystem.readAsStringAsync(fileUri).then((data) => {
+          store.dispatch({type: 'system/set-token', payload: data})
+        });
+      }
+    }
     const restoreState = async () => {
       try {
         const initialUrl = await Linking.getInitialURL();
-          // Only restore state if there's no deep link and we're not on web
-          const savedStateString = await FileSystem.readAsStringAsync(fileName);
-          const state = savedStateString ? JSON.parse(savedStateString) : undefined;
-          if (state !== undefined && state.timestamp > Date.now()) {
-            delete state.timestamp;
-            setInitialState(state);
-          }
+        // Only restore state if there's no deep link and we're not on web
+        const savedStateString = await FileSystem.readAsStringAsync(fileName);
+        const state = savedStateString ? JSON.parse(savedStateString) : undefined;
+        if (state !== undefined && state.timestamp > Date.now()) {
+          delete state.timestamp;
+          setInitialState(state);
+        }
       } finally {
         setIsReady(true);
       }
-    };
-
-    if (!isReady) {
-      restoreState();
     }
+      if (!isReady) {
+        restoreState();
+        asyncFunc();
+      }
   }, [isReady]);
 
   if (!isReady) {
@@ -67,6 +83,8 @@ export default function App() {
         <NavigationContainer
             initialState={initialState}
             onStateChange={(state) => {
+              console.log(store.getState().system);
+              console.log(state);
               FileSystem.writeAsStringAsync(fileName, JSON.stringify({...state, timestamp: Date.now() + 24*60*60}))
             }
             }

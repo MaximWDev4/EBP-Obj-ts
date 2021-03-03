@@ -4,12 +4,11 @@ import * as FileSystem from 'expo-file-system';
 import {Data, UndefProps} from "../Navigation/NavTypes";
 import {useEffect} from "react";
 import {Button} from "react-native-elements";
+import {store} from "../Store";
 
 
 export default function StartScreen({ navigation }: UndefProps) {
-	let Data: Data = {
-		"Token": '',
-	}
+	let Data: Data = {}
 
 	useEffect(() => {
 		let asyncFunc = async () => {
@@ -24,7 +23,7 @@ export default function StartScreen({ navigation }: UndefProps) {
 			// navigation.replace('Login');
 			if (p1) {
 				FileSystem.readAsStringAsync(fileUri).then((data) => {
-					Data.Token = data;
+					store.dispatch({type: 'system/set-token', payload: data})
 					navigation.replace('Main',
 						Data)
 				});

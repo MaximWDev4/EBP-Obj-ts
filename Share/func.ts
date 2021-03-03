@@ -5,6 +5,7 @@ import DB from "./storage";
 import * as FileSystem from 'expo-file-system';
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
+import {store} from "../Store";
 
 
 const getUrl = (action: any) => {
@@ -148,147 +149,156 @@ const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
 // }
 
 
-const sendPhoto = async (sid: string | number, record: any, Token: string, rout: 'znak' | 'obj')  => {
-	const img_old: string[] = record.imageBefore ? record.imageBefore : JSON.parse(record.img_old);
-	const img_new: string[] = record.imageAfter ? record.imageAfter : JSON.parse(record.img_old);
-	const url = getUrl(rout == 'znak' ? 'foto' : 'foto-obj');
-	const formData = new FormData();
-	let imageExists: boolean[] = [];
-	let image2Exists: boolean[] = [];
-	let img;
-	try {
-		for (let i = 0; i < img_old.length && i < img_new.length; i++) {
-			img = img_old[i];
-			if ((await FileSystem.getInfoAsync(img)).exists) {
-				imageExists.push(true);
-			} else {
-				imageExists.push(false);
+const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj')  => {
+	let db = new DB;
+	console.log(record)
+	if ( (record.imageBefore && record.imageAfter && !!record.imageBefore[0] && !!record.imageAfter[0]) || (!!record.img_old && !!record.img_new && !!JSON.parse(record.img_old)[0] && !!JSON.parse(record.img_new)[0])) {
+		const img_old: string[] = record.imageBefore ? record.imageBefore : JSON.parse(record.img_old);
+		const img_new: string[] = record.imageAfter ? record.imageAfter : JSON.parse(record.img_new);
+		let Token: string = store.getState().system.token;
+		const url = getUrl(rout == 'znak' ? 'foto' : 'foto-obj');
+
+		const formData = new FormData();
+		let imageExists: boolean[] = [];
+		let image2Exists: boolean[] = [];
+		let img;
+		try {
+			for (let i = 0; i < img_old.length && i < img_new.length; i++) {
+				img = img_old[i];
+				if ((await FileSystem.getInfoAsync(img)).exists) {
+					imageExists.push(true);
+				} else {
+					imageExists.push(false);
+				}
+				img = img_new[i];
+				if ((await FileSystem.getInfoAsync(img)).exists) {
+					image2Exists.push(true);
+				} else {
+					image2Exists.push(false);
+				}
 			}
-			img = img_new[i];
-			if ((await FileSystem.getInfoAsync(img)).exists) {
-				image2Exists.push(true);
-			} else {
-				image2Exists.push(false);
-			}
+		} catch (e) {
+			imageExists = [];
+			image2Exists = [];
 		}
-	} catch (e) {
-		imageExists = [];
-		image2Exists = [];
-	}
-	try {
-		let res: boolean | number = false;
-		if (rout == 'znak') {
-			formData.append('Token', Token);
-			formData.append('ID', sid.toString());
-			if (imageExists[0] && image2Exists[0]) {
-				formData.append('IMG_OLD', {// @ts-ignore
-					uri: img_old[0],
-					name: `image_old.${img_old[0].substr(img_old[0].length - 3)}`,
-					type: `image/${img_old[0].substr(img_old[0].length - 3)}`
-				});
-				formData.append('IMG_NEW', {// @ts-ignore
-					uri: img_new[0],
-					name: `image_new.${img_new[0].substr(img_new[0].length - 3)}`,
-					type: `image/${img_new[0].substr(img_new[0].length - 3)}`
-				});
-			}
-			try {
-				await fetch(url, {
-					method: 'post',
-					headers: {
-						"Content-Type": "multipart/form-data"
-					},
-					body: formData,
-				})
-					.then((response) => {
-						return response.json();
-					})
-					.then(async (responseJson) => {
-						console.log(responseJson);
-						res = responseJson.code;
-
-						if (res == 0) {
-							let db = new DB;
-							await db.deleteZnak(record, () => null);
-						} else {
-							Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
-						}
-					})
-					.catch(err => {
-						return err;
-					})
-			} catch (e) {
-				alert(e);
-				return e
-			}
-			return 'success'
-
-		} else if (rout == 'obj') {
-			if (imageExists.length && image2Exists.length) {
+		try {
+			let res: boolean | number = false;
+			if (rout == 'znak') {
 				formData.append('Token', Token);
 				formData.append('ID', sid.toString());
-				for (let i = 0; i < img_old.length && i < img_new.length; i++) {
-					if (imageExists[i]) {
-						console.log('set1')
-						formData.append('IMG_OLD', {// @ts-ignore
-							uri: img_old[i],
-							name: `image_old.${img_old[i].substr(img_old[i].length - 3)}`,
-							type: `image/${img_old[i].substr(img_old[i].length - 3)}`
-						});
-					}
-					if (image2Exists[i]) {
-						console.log('set2')
-						formData.append('IMG_NEW', {// @ts-ignore
-							uri: img_new[i],
-							name: `image_new.${img_new[i].substr(img_new[i].length - 3)}`,
-							type: `image/${img_new[i].substr(img_new[i].length - 3)}`
-						});
-					}
-					if (imageExists[i] && image2Exists[i]) {
-						try {
-							await fetch(url, {
-								method: 'post',
-								headers: {
-									"Content-Type": "multipart/form-data"
-								},
-								body: formData,
-							})
-								.then((response) => {
-									return response.json();
-								})
-								.then(async (responseJson) => {
-									console.log(responseJson);
-									res = responseJson.code;
+				if (imageExists[0] && image2Exists[0]) {
+					formData.append('IMG_OLD', {// @ts-ignore
+						uri: img_old[0],
+						name: `image_old.${img_old[0].substr(img_old[0].length - 3)}`,
+						type: `image/${img_old[0].substr(img_old[0].length - 3)}`
+					});
+					formData.append('IMG_NEW', {// @ts-ignore
+						uri: img_new[0],
+						name: `image_new.${img_new[0].substr(img_new[0].length - 3)}`,
+						type: `image/${img_new[0].substr(img_new[0].length - 3)}`
+					});
+				}
+				try {
+					await fetch(url, {
+						method: 'post',
+						headers: {
+							"Content-Type": "multipart/form-data"
+						},
+						body: formData,
+					})
+						.then((response) => {
+							return response.json();
+						})
+						.then(async (responseJson) => {
+							console.log(responseJson);
+							res = responseJson.code;
 
-									if (res == 0) {
-										let db = new DB;
-										await db.deleteZnak(record, () => null);
-									} else {
-										Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
-										Promise.reject(('Response Failed' + i)).then((e) => {
-											console.log(e)
-										}, (s) => {
-											console.log(s)
-										})
-										return "fail"
-									}
+							if (res == 0) {
+								await db.deleteZnak(record, () => null);
+							} else {
+								Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
+							}
+						})
+						.catch(err => {
+							return err;
+						})
+				} catch (e) {
+					alert(e);
+					return e
+				}
+				return 'success'
+
+			} else if (rout == 'obj') {
+				if (imageExists.length && image2Exists.length) {
+					formData.append('Token', Token);
+					formData.append('ID', sid.toString());
+					for (let i = 0; i < img_old.length && i < img_new.length; i++) {
+						if (imageExists[i]) {
+							console.log('set1')
+							formData.append('IMG_OLD', {// @ts-ignore
+								uri: img_old[i],
+								name: `image_old.${img_old[i].substr(img_old[i].length - 3)}`,
+								type: `image/${img_old[i].substr(img_old[i].length - 3)}`
+							});
+						}
+						if (image2Exists[i]) {
+							console.log('set2')
+							formData.append('IMG_NEW', {// @ts-ignore
+								uri: img_new[i],
+								name: `image_new.${img_new[i].substr(img_new[i].length - 3)}`,
+								type: `image/${img_new[i].substr(img_new[i].length - 3)}`
+							});
+						}
+						if (imageExists[i] && image2Exists[i]) {
+							try {
+								await fetch(url, {
+									method: 'post',
+									headers: {
+										"Content-Type": "multipart/form-data"
+									},
+									body: formData,
 								})
-								.catch(err => {
-									return err;
-								})
-						} catch (e) {
-							alert(e);
-							return e
+									.then((response) => {
+										return response.json();
+									})
+									.then(async (responseJson) => {
+										console.log(responseJson);
+										res = responseJson.code;
+
+										if (res == 0) {
+											let db = new DB;
+											await db.deleteZnak(record, () => null);
+										} else {
+											Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
+											Promise.reject(('Response Failed' + i)).then((e) => {
+												console.log(e)
+											}, (s) => {
+												console.log(s)
+											})
+											return "fail"
+										}
+									})
+									.catch(err => {
+										return err;
+									})
+							} catch (e) {
+								alert(e);
+								return e
+							}
 						}
 					}
+				} else {
+					return 'Ошибка: Не найдены изображения'
 				}
-			} else {
-				return 'Ошибка: Не найдены изображения'
 			}
+			return 'success'
+		} catch (e) {
+			alert(e)
+			return 'failed'
 		}
-		return 'success'
-	} catch (e) {
-		alert(e)
+	} else {
+		db.deleteZnak(record, () => null);
+		return 'Нет фото, запись удалена'
 	}
 }
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, StyleSheet, Button } from 'react-native';
+import {View, StyleSheet, Button, BackHandler} from 'react-native';
 import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
@@ -7,6 +7,7 @@ import DB from '../Share/storage'
 import {MainDataProps, Data} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {CommonActions} from "@react-navigation/native";
+import {store} from "../Store";
 
 
 export default function MainScreen({ route, navigation }: MainDataProps) {
@@ -26,8 +27,6 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 
 				if (data === ''){
 					navigation.replace('Login');
-				} else {
-					Data.Token = data;
 				}
 			})
 			.catch((err) => {
@@ -53,7 +52,7 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'gost');
 		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'tiporaz');
 		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'krepl');
-
+		store.dispatch({type: 'system/clear-token', payload: ''})
 		navigation.dispatch(
 			CommonActions.reset({
 				index: 5,
@@ -264,14 +263,38 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 			</View>
 
 			<View style={{
-				flex: 1,
+				flex: 0.33,
+				flexDirection: 'column-reverse',
+				padding: 5,
+			}}>
+				<Button
+					title='Выйти из аккаунта'
+					onPress={() => {
+						logout().then();
+					}}
+
+					//onPress={() => {
+					//fetchData(2)
+					//}}
+				>
+				</Button>
+			</View>
+			<View style={{
+				flex: 0.33,
 				flexDirection: 'column-reverse',
 				padding: 5,
 			}}>
 				<Button
 					title='Выйти'
 					onPress={() => {
-						logout().then();
+						Alert.alert("Уверены?", "Выйти из приложения", [
+							{
+								text: "Отмена",
+								onPress: () => null,
+								style: "cancel"
+							},
+							{text: "Да", onPress: () => BackHandler.exitApp()}
+						])
 					}}
 
 					//onPress={() => {

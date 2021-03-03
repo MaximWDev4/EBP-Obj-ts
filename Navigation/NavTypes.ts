@@ -16,7 +16,6 @@ export type GPS = {
 }
 
 export type Data = {
-    "Token": string,
     "gps"?: GPS,
     "imageAfter"?:string[],
     "imageBefore"?: string[],

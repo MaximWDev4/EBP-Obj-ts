@@ -1,4 +1,4 @@
-import { CLEAR_GPS, gpsActionType, SET_GPS, stateType} from "../types";
+import { CLEAR_GPS, gpsActionType, SET_GPS, stateType2} from "../types";
 
 const defaultState = {
     s: [{
@@ -17,11 +17,9 @@ const defaultState = {
 export function gpsReducer(
     state = defaultState,
     action: gpsActionType
-): stateType {
-    console.log(action.type)
+): stateType2 {
     switch (action.type) {
         case SET_GPS: {
-            console.log(action.payload)
             if (!!action.payload) {
                 return {
                    s: action.payload

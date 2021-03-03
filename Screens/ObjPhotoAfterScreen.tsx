@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {GestureResponderEvent, Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import * as Permissions from 'expo-permissions';
+import {Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Data, ObjDataProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {pickImage, RenderPhotoView} from "../Share/screensAPI";

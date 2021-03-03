@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import {Data, UndefProps} from '../Navigation/NavTypes'
 import { getUrl } from '../Share/func';
 import {useState} from "react";
+import {store} from "../Store";
 
 
 export function LoginScreen ({route, navigation}: UndefProps) {
@@ -199,6 +200,7 @@ export function LoginScreen ({route, navigation}: UndefProps) {
 				})
 				.then((responseJson) => {
 					Data.Token = Token;
+					store.dispatch({type: 'system/set-token', payload: Token})
 					navigation.replace('Welcome', Data)
 					//this.props.navigation.navigate('Znak', { Data: this.Token })
 

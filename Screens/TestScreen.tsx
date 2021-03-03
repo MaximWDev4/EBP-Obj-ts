@@ -6,6 +6,7 @@ import { sendZnakObj } from '../Share/func';
 import DB from '../Share/storage'
 import {SignDataProps, Data} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
+import {store} from "../Store";
 
 export type gostType = {id: number, name: string}[];
 const gostTypes: gostType = [
@@ -27,9 +28,8 @@ export default function TestScreen({navigation, route}: SignDataProps) {
 	const [gostSource, setGostSource] = useState([[]]);
 	const [tiporazSource, setTiporazSource] = useState(['']);
 	const [kreplSource, setKreplSource] = useState(['']);
-
 	const Data: Data = route.params;
-
+	const Token: string = store.getState().system.token
 	//Token=a6065650fb9b5df5f8bdaa796ab50c84&GPS_X=43.2784767&GPS_Y=76.8956883&QRDATA=QR SMEU15028659185727&GOST=19&TIPORAZ=1&KREPL=74
 
 
@@ -61,7 +61,7 @@ export default function TestScreen({navigation, route}: SignDataProps) {
 			'TIPORAZ=' + tiporaz + '&' +
 			'KREPL=' + krepl;
 
-		let body = 'Token=' + Data.Token + '&' + formData;
+		let body = 'Token=' + Token + '&' + formData;
 
 		let send = await sendZnakObj(body, 'saveobj');
 

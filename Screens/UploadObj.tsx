@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import {CommonActions} from "@react-navigation/native";
 import {ModalActivityIndicator} from "../Share/components";
+import {store} from "../Store";
 
 export type listItem ={
 	"id": number,
@@ -23,7 +24,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const [vidRab, setVidRab] = useState<string|number>('');
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
-	const db = new DB;
+	const Token: string = store.getState().system.token;
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
 		await NetInfo.fetch().then(state => {
@@ -41,7 +42,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const sendData = () => {
 
 		let body =
-			'Token=' + Data.Token + '&' +
+			'Token=' + Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'TYPE=' + objType + '&' +
@@ -106,7 +107,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-							sendPhoto(responseJson.id, Data, Data.Token, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
+							sendPhoto(responseJson.id, Data, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
 							} else {
 								//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
