@@ -199,15 +199,16 @@ export const CustomModalWindow = (props: alertProps) => {
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: "space-around",
-                        height: '30%',
+                        height: '50%',
                         backgroundColor: `${backgroundColor}`,
                         borderRadius: 13,
                         paddingVertical: 30,
+                        paddingBottom: 100
                         // paddingHorizontal: 5
                     }}
                 >
                     <Text style={{ color: `${color}`, paddingHorizontal: 40, paddingBottom: 20, fontSize: 15}}>{message}</Text>
-                    <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexGrow: 1, flex: 1}}>{btns}</View>
+                    <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', maxHeight: 10, flexGrow: 1, flex: 1}}>{btns}</View>
                 </View>
             </View>
         </Modal>

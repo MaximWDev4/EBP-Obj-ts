@@ -4,14 +4,13 @@ import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
 import DB from '../Share/storage'
-import {MainDataProps, Data} from "../Navigation/NavTypes";
+import {UndefProps, Data} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {CommonActions} from "@react-navigation/native";
 import {store} from "../Store";
 
 
-export default function MainScreen({ route, navigation }: MainDataProps) {
-	let Data: Data = route.params;
+export default function MainScreen({ route, navigation }: UndefProps) {
 	// const gpsService = Data.gpsService;
 	const [count, setCount] = useState<number | string>('-');
 	let db = new DB;
@@ -40,10 +39,14 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 		);
 	}, [])
 
-	// get ready to send records amount
-	db.getCount((savedCount: number) => {
-		setCount(savedCount)
-	});
+	useEffect(() => {
+		db.getCount((savedCount: number) => {
+			setCount(savedCount)
+		});
+		return () => db.getCount((savedCount: number) => {
+			setCount(savedCount)
+		});
+	})
 
 	const logout = async() => {
 
@@ -76,7 +79,7 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 					style: 'cancel',
 				},
 				{text: 'Да', onPress: () => {
-						navigation.push('SignStack',  Data )
+						navigation.push('SignStack', {imageBefore: []})
 					}},
 			],
 		);
@@ -90,7 +93,7 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 				style: 'cancel',
 			},
 			{text: 'Да', onPress: () => {
-					navigation.push('ObjStack', Data)
+					navigation.push('ObjStack', {imageBefore: []})
 				}},
 			]
 		);
@@ -105,7 +108,7 @@ export default function MainScreen({ route, navigation }: MainDataProps) {
 		if (!count || count === '-') {
 			alert('Нечего выгружать!');
 		} else {
-			navigation.replace('Upload',  Data)
+			navigation.push('Upload')
 		}
 
 	}

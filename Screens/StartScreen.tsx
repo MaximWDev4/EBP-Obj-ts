@@ -24,8 +24,7 @@ export default function StartScreen({ navigation }: UndefProps) {
 			if (p1) {
 				FileSystem.readAsStringAsync(fileUri).then((data) => {
 					store.dispatch({type: 'system/set-token', payload: data})
-					navigation.replace('Main',
-						Data)
+					navigation.replace('Main')
 				});
 			} else {
 				navigation.replace('Login')

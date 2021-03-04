@@ -12,37 +12,35 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 
 	const Data = route.params;
 	const [hasPermission, setHasPermission] = useState(false);
-	const [images, setImages] = useState<string[]>([]);
+	const [images, setImages] = useState<string[]>(Data.imageAfter ? Data.imageAfter : []);
 
 	useEffect(() => {
 		askPermission().then( stat => setHasPermission(stat));
 	}, [])
 
-	const deleteFoto = () => {
-		return async function (p1: GestureResponderEvent) {
-			let fileExists = (await FileSystem.getInfoAsync(images[0])).exists;
-			if (fileExists) {
-				await FileSystem.deleteAsync(images[0]);
+	const deletePhoto = async () => {
+			try {
+				let fileExists = (await FileSystem.getInfoAsync(images[0])).exists;
+				if (fileExists) {
+					await FileSystem.deleteAsync(images[0]);
+				}
+			} finally {
+				setImages([]);
 			}
-			setImages([]);
-		}
 	}
 
 	const next = () => {
-		let data: Data = Data;
-		data.imageBefore =images;
-
-		navigation.navigate('QR', data)
+		navigation.navigate('QR', { imageBefore: images })
 	}
 
 	const IM: ListRenderItem<any> = (props) => {
 		let image;
-		console.log(images[props.index])
-		if (images[props.index] !== '' && typeof images[props.index] !== "undefined") {
+		console.log(props.item)
+		if (props.item !== '' && typeof props.item !== "undefined") {
 			image = (
 				<Image source={
 					// require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
-					{uri: images[props.index]}
+					{uri: props.item}
 				} style={{width: 100, height: 100}}/>
 			)
 		}
@@ -59,7 +57,7 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 					flex: 3
 				}}>
 
-					<Image source={{uri: images[props.index]}} style={{width: 100, height: 100}}/>
+					<Image source={{uri: props.item}} style={{width: 100, height: 100}}/>
 				</View>
 
 				<View style={{
@@ -79,7 +77,7 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 						paddingBottom: 25,
 						flex: 1
 					}}>
-					<TouchableOpacity onPress={ () => deleteFoto()}>
+					<TouchableOpacity onPress={ () => deletePhoto()}>
 						<Image style={{
 							width: 32,
 							height: 32,
@@ -91,6 +89,10 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 			</View>
 		)
 	}
+
+	useEffect(() => {
+		console.log(images)
+	})
 
 	return (RenderPhotoView(images, next, IM,(type) => pickImage(type, hasPermission, async (s, result) => {
 			if (s) {

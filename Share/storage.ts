@@ -347,28 +347,31 @@ export default class DB {
 	  }
 
 	  deleteZnak =  (item: any, callback: any) => {
-		let imgs_old: string[] = JSON.parse(item.img_old);
-		let imgs_new: string[] = JSON.parse(item.img_new);
-		if (!!imgs_old) {
-			imgs_old.map(async (img_old: string) => {
-				let fileExists = (await FileSystem.getInfoAsync(img_old)).exists;
-				if (fileExists) {
-					await FileSystem.deleteAsync(img_old);
-				}
-			})
-		}
-		if (!!imgs_new) {
-			imgs_new.map(async (img_new) => {
-				let fileExists2 = (await FileSystem.getInfoAsync(img_new)).exists;
+		try {
+			let imgs_old: string[] = JSON.parse(item.img_old);
+			let imgs_new: string[] = JSON.parse(item.img_new);
+			if (!!imgs_old) {
+				imgs_old.map(async (img_old: string) => {
+					let fileExists = (await FileSystem.getInfoAsync(img_old)).exists;
+					if (fileExists) {
+						await FileSystem.deleteAsync(img_old);
+					}
+				})
+			}
+			if (!!imgs_new) {
+				imgs_new.map(async (img_new) => {
+					let fileExists2 = (await FileSystem.getInfoAsync(img_new)).exists;
 
-				if (fileExists2) {
-					await FileSystem.deleteAsync(img_new);
-				}
-			})
+					if (fileExists2) {
+						await FileSystem.deleteAsync(img_new);
+					}
+				})
+			}
+		} finally {
+			this.db.transaction((tx: any) => {
+				tx.executeSql("delete from record where id = ?;", [item.id]);
+			});
 		}
-		  this.db.transaction( (tx: any) => {
-			  tx.executeSql("delete from record where id = ?;", [item.id]);
-		  });
 		  //callback();
 	  }
 

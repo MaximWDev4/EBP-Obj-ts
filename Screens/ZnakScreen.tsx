@@ -33,6 +33,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
 	const Token: string = store.getState().system.token;
+	let timeout: any;
 	const Network = async (): Promise<boolean> => {
 		let check: undefined | boolean = false;
 		await NetworkExpo.getNetworkStateAsync().then((state: NetworkExpo.NetworkState) => {
@@ -53,8 +54,13 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 
 	},[])
 
+	useEffect(() => {
+		return clearTimeout(timeout)
+	})
+
 	const next = () => {
 		setLoading(false);
+		clearTimeout(timeout)
 		Data.gps = undefined;
 		Data.imageBefore = undefined;
 		Data.imageAfter = undefined;
@@ -108,7 +114,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 				if (
 					state
 				) {
-					setTimeout(() => {
+					timeout = setTimeout(() => {
 						setLoading(false)
 						saveRecord(body).then(() => {
 							Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
@@ -127,7 +133,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 								}
 							])
 						});
-					}, 10000)
+					}, 30000)
 					fetch(url, {
 						method: 'post',
 						headers: {

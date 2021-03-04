@@ -11,9 +11,6 @@ import {store} from "../Store";
 
 export function LoginScreen ({route, navigation}: UndefProps) {
 	let Token: any = '';
-	const Data: Data = {
-		Token
-	};
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 
@@ -199,9 +196,8 @@ export function LoginScreen ({route, navigation}: UndefProps) {
 
 				})
 				.then((responseJson) => {
-					Data.Token = Token;
 					store.dispatch({type: 'system/set-token', payload: Token})
-					navigation.replace('Welcome', Data)
+					navigation.replace('Welcome')
 					//this.props.navigation.navigate('Znak', { Data: this.Token })
 
 				}).catch((error) => Alert.alert('Неверный логин или пароль'));

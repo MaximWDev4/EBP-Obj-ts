@@ -5,7 +5,7 @@ import { Picker } from '@react-native-community/picker';
 import * as FileSystem from 'expo-file-system';
 import {addRecord, getUrl, sendPhoto} from '../Share/func';
 import DB from '../Share/storage'
-import {Data, SignDataProps} from "../Navigation/NavTypes";
+import {Data, ObjDataProps, SignDataProps} from "../Navigation/NavTypes";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import {CommonActions} from "@react-navigation/native";
@@ -17,7 +17,7 @@ export type listItem ={
 	"name": string
 }
 
-export default function ObjUpload({navigation, route}: SignDataProps) {
+export default function ObjUpload({navigation, route}: ObjDataProps) {
 	const [vidRabSource, setVidRabSource] = useState<listItem[]>([]);
 	const [objTypeSource, setObjTypeSource] = useState<listItem[]>([]);
 	const [objType, setObjType] = useState<string|number>('');
@@ -25,6 +25,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
 	const Token: string = store.getState().system.token;
+	let timeout: any;
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
 		await NetInfo.fetch().then(state => {
@@ -39,6 +40,12 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 		getObjType();
 
 	},[])
+
+	useEffect(() => {
+		return clearTimeout(timeout)
+	})
+
+
 	const sendData = () => {
 
 		let body =
@@ -47,27 +54,16 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'TYPE=' + objType + '&' +
 			'VIDR=' + vidRab;
-
+		const saveRecord = async (body: any) => {
+			let saveBefore = Data.imageBefore;
+			let saveAfter = Data.imageAfter;
+			await addRecord('znak', body, saveBefore, saveAfter)
+		}
 		const url = getUrl('saveobj');
-		// const saveImage = async (Data: Data, id: number) => {
-		// 	let ImgStorage = FileSystem.documentDirectory + 'Image_';
-		// 	let uri = id === 1 ? Data.imageBefore : Data.imageAfter;
-		// 	let destination = ImgStorage + uri?.substr(uri?.length - 10);
-		// 	if (uri) {
-		// 		let downloadObject = FileSystem.moveAsync({
-		// 				from: uri,
-		// 				to: destination
-		// 			}
-		// 		);
-		// 		await downloadObject;
-		//
-		// 		return destination;
-		// 	} else{
-		// 		return ''
-		// 	}
-		// }
+
 		const next = (response: any) => {
 			setLoading(false);
+			clearTimeout(timeout);
 			Data.gps = undefined;
 			Data.imageBefore = [];
 			Data.imageAfter = [];
@@ -93,6 +89,26 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 				if (
 					state
 				) {
+					timeout = setTimeout(() => {
+						setLoading(false)
+						saveRecord(body).then(() => {
+							Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+								{
+									text: 'Вернуться на главный экран',
+									onPress: () => navigation.dispatch(
+										CommonActions.reset({
+											index: 5,
+											routes: [
+												{
+													name: 'Root'
+												}
+											]
+										})
+									)
+								}
+							])
+						});
+					}, 30000)
 					console.log(body);
 					fetch(url, {
 						method: 'post',
@@ -106,8 +122,10 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 							return response.json()
 						})
 						.then((responseJson) => {
+							console.log(responseJson);
 							if (responseJson.code == 0) {
-							sendPhoto(responseJson.id, Data, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
+								console.log('start sending photo')
+							sendPhoto(responseJson.id, Data, 'obj').then(() => next((responseJson: any) =>  { console.log('end sending: ',responseJson)}));
 							} else {
 								//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
@@ -144,13 +162,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 						})
 				}
 				else {
-					const saveRecord = async () => {
-						let saveBefore = Data.imageBefore;
-						let saveAfter = Data.imageAfter;
-						addRecord('obj', body, saveBefore, saveAfter).then((data) => {
-						});
-					}
-					saveRecord().then(() => {
+					saveRecord(body).then(() => {
 						Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище', [
 							{
 								text: 'Вернуться на главный экран',

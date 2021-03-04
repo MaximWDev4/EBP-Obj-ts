@@ -35,7 +35,7 @@ const ObjStack = createStackNavigator<ObjStackParamList>();
 const returnHome = (navigation: any) => {
     navigation.dispatch(
         CommonActions.reset({
-            index: 5,
+            index: 0,
             routes: [
                 {
                     name: 'Root'
@@ -97,7 +97,7 @@ export function AppNavigation() {
             <RootStack.Screen name="Main" component={MainScreen}  options={{title: 'Меню',}} />
             <RootStack.Screen name="SignStack" component={SignNavigation} options={{title: '', headerShown: false }}/>
             <RootStack.Screen name="ObjStack" component={ObjNavigation}  options={{title: '', headerShown: false }}/>
-            <RootStack.Screen name="Upload" component={UploadScreen} options={{title: 'Вфгрузка сохраненных записей',}}/>
+            <RootStack.Screen name="Upload" component={UploadScreen} options={{title: 'Выгрузка сохраненных записей',}}/>
 
         </RootStack.Navigator>
     );

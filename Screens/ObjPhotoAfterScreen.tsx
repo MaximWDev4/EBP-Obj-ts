@@ -8,8 +8,7 @@ import * as FileSystem from "expo-file-system";
 import {askPermission} from "../Share/func";
 
 export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
-
-    const Data = route.params;
+    const Data : Data = route.params;
     const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [images, setImages] = useState<string[]>([]);
 
@@ -34,12 +33,16 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
 
     const deleteFoto = async (id: number) => {
         let tempArr: string[];
-        let fileExists = (await FileSystem.getInfoAsync(images[id])).exists;
-        if (fileExists) {
-            await FileSystem.deleteAsync(images[id]);
+        try {
+            let fileExists = (await FileSystem.getInfoAsync(images[id])).exists;
+            if (fileExists) {
+                await FileSystem.deleteAsync(images[id]);
+            }
+        } finally {
+            tempArr = [...images]
+            tempArr.splice(id, 1)
+            setImages(tempArr);
         }
-        tempArr = images.filter((v, i) => i !== id)
-        setImages(tempArr);
     }
 
     const next = () => {
@@ -51,12 +54,12 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
 
     const IM: ListRenderItem<any> = (props) => {
         let image;
-        console.log(images[props.index])
-        if (images[props.index] !== '' && typeof images[props.index] !== "undefined") {
+        console.log(props.item)
+        if (props.item !== '' && typeof props.item !== "undefined") {
             image = (
                 <Image source={
                     // require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
-                    {uri: images[props.index]}
+                    {uri: props.item}
                 } style={{width: 100, height: 100}}/>
             )
         }

@@ -41,12 +41,12 @@ export default function ObjGPSScreen ({route, navigation}: ObjDataProps) {
 		// TaskManager.unregisterAllTasksAsync();
 		// gpsService.setDefault();
 		//const Data = Data;
-		if (!gps) {
+		if (!min) {
 			Alert.alert(
 				'Error',
 				'Coords not set!');
 		} else {
-			Data.gps = gps;
+			Data.gps = min;
 			navigation.navigate('ObjPhotoAfter', Data)
 		}
 

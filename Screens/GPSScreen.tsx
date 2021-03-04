@@ -36,12 +36,12 @@ export default function GPSScreen ({route, navigation}: SignDataProps) {
 
 
 	const next = () => {
-		if (!gps) {
+		if (!min) {
 			Alert.alert(
 				'Error',
 				'Coords not set!');
 		} else {
-			Data.gps = gps;
+			Data.gps = min;
 			navigation.navigate('SignPhotoAfter', Data)
 		}
 	}

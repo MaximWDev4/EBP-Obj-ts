@@ -13,26 +13,33 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 import { Alert } from 'react-native';
 import { Image } from 'react-native';
-import { MainDataProps} from "../Navigation/NavTypes";
+import { UndefProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import DB from "../Share/storage";
 import {sendZnakObj, sendPhoto} from "../Share/func";
 import {store} from "../Store";
+import NetInfo from "@react-native-community/netinfo";
 
 
 
-export function UploadScreen ({route, navigation}: MainDataProps) {
+export function UploadScreen ({route, navigation}: UndefProps) {
 	let db: DB = new DB();
-	const Data = route.params;
 	const [images, setImages] = useState<any[]>([]);
 	const [records, setRecords] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
+	const Network = async (): Promise<boolean> => {
+		let check: boolean = false;
+		await NetInfo.fetch().then(state => {
+			check = state.isConnected;
+		});
+		return check;
+	}
 	useEffect(() => {
 			setLoading(true);
 			let timeout = setTimeout(() => {
 				setLoading(false);
 				alert('Ошибка загрузки')
-			}, 5000);
+			}, 30000);
 			let errCodes: number[] = [];
 			try {
 				db.getZnaki(async (arr: any[]) => {
@@ -75,9 +82,7 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 		}
 	, []);
 
-	useEffect(() => {
-		console.log(records)
-	}, [records])
+
 	const send = async (record: any, callback: any) => {
 		try {
 			let body = 'Token=' + '45'+store.getState().system.token + '&' + record.data + '&' + 'DATE' + record.dt;
@@ -168,21 +173,24 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 
 
 	function deleteRecord(znak: any) {
-		return function (p1: GestureResponderEvent) {
+		let tempArr: any[] = [];
 			db.deleteZnak(znak, () => {
-				db.getZnaki((arr: any[]) => {
-					setRecords(arr);
-					setImages([]);
-					let tempArr: any[] = [];
-					arr.forEach((znak) => {
-						let img_old = JSON.parse(znak.img_old);
-						let img_new = JSON.parse(znak.img_new)
-						tempArr.push(img_old !== '' ? img_old : img_new);
+				try {
+					db.getZnaki((arr: any[]) => {
+						setRecords(arr);
+						setImages([]);
+
+						arr.forEach((znak) => {
+							let img_old = JSON.parse(znak.img_old);
+							let img_new = JSON.parse(znak.img_new)
+							tempArr.push(!!img_old ? img_old : img_new);
+						});
+						setImages(tempArr);
 					});
+				} finally {
 					setImages(tempArr);
-				});
+				}
 			});
-		};
 	}
 
 	const renderRecord: ListRenderItem<any> = (props) => {
@@ -269,7 +277,7 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 							paddingBottom: 25,
 							flex: 1
 						}}>
-						<TouchableOpacity onPress={deleteRecord(records[props.index])}>
+						<TouchableOpacity onPress={() => deleteRecord(records[props.index])}>
 							<Image style={{
 								width: 32,
 								height: 32,
@@ -343,8 +351,15 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 						// style={{ flex: 1,}}
 						disabled={!records.length}
 						onPress={() => {
-							//next();
-							upload('top');
+							Network().then((state) =>
+							{
+								if (state) {
+									upload('top');
+							} else {
+									Alert.alert('Нет интернета')
+								}
+							})
+
 						}}
 					>
 					</Button>
@@ -359,8 +374,14 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 						// style={{ flex: 1,}}
 						disabled={!records.length}
 						onPress={() => {
-							//next();
-							upload('all');
+							Network().then((state) =>
+							{
+								if (state) {
+									upload('all');
+								} else {
+									Alert.alert('Нет интернета')
+								}
+							})
 						}}
 					>
 					</Button>
@@ -376,7 +397,7 @@ export function UploadScreen ({route, navigation}: MainDataProps) {
 					<Button
 						title='Отменить'
 						onPress={() => {
-							navigation.replace('Main', Data)
+							navigation.replace('Main')
 						}}
 					>
 					</Button>

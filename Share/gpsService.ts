@@ -105,16 +105,16 @@ export class GpsService {
             });
             Gps.map((item) => {
                 // let prevItem = this.Gps[i - 1];
-                if (Result.coords && item.coords && Result.coords.latitude && Result.coords.latitude && item.coords.latitude && item.coords.longitude && item.coords.accuracy) {
-                    SLat += (Result.coords.latitude - item.coords.latitude) / (item.coords.accuracy);
-                    SLon += (Result.coords.latitude - item.coords.longitude) / (item.coords.accuracy);
+                if (Result.coords && item.coords && Result.coords.latitude && Result.coords.longitude && item.coords.latitude && item.coords.longitude && item.coords.accuracy) {
+                    SLat += (Result.coords.latitude - item.coords.latitude) / (item.coords.accuracy * 2);
+                    SLon += (Result.coords.longitude - item.coords.longitude) / (item.coords.accuracy * 2);
                     // console.log(prevItem.coords.latitude + ' - ' + item.coords.latitude + ') / ((' + item.coords.accuracy + ' + ' + prevItem.coords.accuracy + ') / 2) = ' + SLat);
                 }
             });
             if (Result.coords && Result.coords.latitude && Result.coords.longitude) {
                 // console.log((SLat / n) + this.Gps[0].coords.latitude);
-                Result.coords.latitude = Result.coords.latitude + (SLat / n);
-                Result.coords.longitude = Result.coords.longitude + (SLon / n);
+                Result.coords.latitude = Result.coords.latitude - (SLat / n);
+                Result.coords.longitude = Result.coords.longitude - (SLon / n);
                 Gps.map((item) => {
                     if (item.coords && item.coords.accuracy) {
                         delLat += item.coords.accuracy;

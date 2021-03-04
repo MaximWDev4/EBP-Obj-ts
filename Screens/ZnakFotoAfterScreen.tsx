@@ -25,32 +25,28 @@ export default function ZnakFotoAfterScreen ({route, navigation}: SignDataProps)
 	}, [])
 
 
-	const deleteFoto = () => {
-		return async function (p1: GestureResponderEvent) {
-			let fileExists = (await FileSystem.getInfoAsync(images[0])).exists;
-			if (fileExists) {
-				await FileSystem.deleteAsync(images[0]);
+	const deleteFoto = async () => {
+			try {
+				let fileExists = (await FileSystem.getInfoAsync(images[0])).exists;
+				if (fileExists) {
+					await FileSystem.deleteAsync(images[0]);
+				}
+			} finally {
+				setImages([]);
 			}
-			setImages([]);
-		}
 	}
 
 	const next = () => {
 		let data: Data = Data;
 		data.imageAfter = images;
-
-		//props.navigation.navigate('Znak', {
-		//image: state.image,
-		//})
-
 		navigation.navigate('Znak', data);
 	}
 
 
 	const IM: ListRenderItem<any> = (props) => {
 		let image;
-		console.log(images[props.index])
-		if (images[props.index] !== '' && typeof images[props.index] !== "undefined") {
+		console.log(props.item)
+		if (props.item !== '' && typeof props.item !== "undefined") {
 			image = (
 				<Image source={
 					// require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')

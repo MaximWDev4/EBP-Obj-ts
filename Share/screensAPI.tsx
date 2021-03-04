@@ -188,7 +188,7 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
                         title='Продолжить'
                         // style={{ flex: 1,
                         // }}
-                        disabled={!im}
+                        disabled={!im.length}
                         onPress={() => {
                             next();
                         }}

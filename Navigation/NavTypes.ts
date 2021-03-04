@@ -1,6 +1,5 @@
 import { RouteProp } from '@react-navigation/native';
 import {StackNavigationProp} from "@react-navigation/stack";
-import {GpsService} from "../Share/gpsService";
 
 export type GPS = {
         "coords": {
@@ -27,12 +26,12 @@ export type Data = {
 export type RootStackParamList = {
     Start: undefined;
     Login: undefined;
-    Welcome: Data;
-    Main: Data;
-    SignStack: Data;
-    ObjStack: Data;
+    Welcome: undefined;
+    Main: undefined;
+    SignStack: {imageBefore: any[]};
+    ObjStack: {imageBefore: any[]};
     // Revision: undefined;
-    Upload:  Data ;
+    Upload:  undefined ;
 };
 
 export type SignStackParamList = {
@@ -93,14 +92,14 @@ export type ObjGPSScreenNavigationProp = StackNavigationProp<ObjStackParamList, 
 
 export type SignDataProps = {
     route:  GPSScreenRouteProp
-        | QRScreenRouteProp
         | SignPhotoBeforeScreenRouteProp
+        | QRScreenRouteProp
         | SignPhotoAfterScreenRouteProp
         | ZnakScreenRouteProp;
 
     navigation:  GPSScreenNavigationProp
-        | QRScreenNavigationProp
         | SignPhotoBeforeScreenNavigationProp
+        | QRScreenNavigationProp
         | SignPhotoAfterScreenNavigationProp
         | ZnakScreenNavigationProp;
 }
@@ -112,34 +111,30 @@ export type ObjDataProps = {
         |ObjGPSScreenRouteProp;
 
     navigation:
-          ObjPhotoBeforeScreenNavigationProp
         | ObjPhotoAfterScreenNavigationProp
+        | ObjPhotoBeforeScreenNavigationProp
         | ObjGPSScreenNavigationProp;
 }
-
-export type MainDataProps = {
+export type UndefProps = {
     route:
-          UploadScreenRouteProp
-        | WelcomeScreenRouteProp
+        LoginScreenRouteProp
+        | StartScreenRouteProp
+
         | MainScreenRouteProp
         | SignStackRouteProp
-        | ObjStackRouteProp;
+        | ObjStackRouteProp
+        | UploadScreenRouteProp
+        | WelcomeScreenRouteProp
 
     navigation:
-          UploadScreenNavigationProp
-        | WelcomeScreenNavigationProp
+        LoginScreenNavigationProp
+        | StartScreenNavigationProp
         | MainScreenNavigationProp
+        | WelcomeScreenNavigationProp
         | SignStackNavigationProp
-        | ObjStackNavigationProp;
-}
+        | UploadScreenNavigationProp
+        | ObjStackNavigationProp
 
-export type UndefProps = {
-    route: LoginScreenRouteProp
-        | StartScreenRouteProp
-        // | RevisionScreenRouteProp
-    ;
-    navigation:LoginScreenNavigationProp | StartScreenNavigationProp
-        // | RevisionScreenNavigationProp
-    ;
+
 }
 
