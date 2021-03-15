@@ -68,7 +68,16 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 		Alert.alert('OK', 'Отчет успешно отправлен', [
 			{
 				text: 'Вернуться на главный экран',
-				onPress: () => navigation.replace('Root')
+				onPress: () => navigation.dispatch(
+					CommonActions.reset({
+						index: 0,
+						routes: [
+							{
+								name: 'Root'
+							}
+						]
+					})
+				)
 			}
 		]);
 	}
@@ -122,7 +131,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 									text: 'Вернуться на главный экран',
 									onPress: () => navigation.dispatch(
 										CommonActions.reset({
-											index: 5,
+											index: 0,
 											routes: [
 												{
 													name: 'Root'
@@ -153,7 +162,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 										text: 'Вернуться на главный экран',
 										onPress: () => navigation.dispatch(
 											CommonActions.reset({
-												index: 5,
+												index: 0,
 												routes: [
 													{
 														name: 'Root'
@@ -180,12 +189,12 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 								text: 'Вернуться на главный экран',
 								onPress: () => navigation.dispatch(
 									CommonActions.reset({
-										index: 5,
+										index: 0,
 										routes: [
 											{
 												name: 'Root'
 											}
-											]
+										]
 									})
 								)
 							}
