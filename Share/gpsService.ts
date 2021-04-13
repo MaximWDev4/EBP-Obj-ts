@@ -15,6 +15,7 @@ export class GpsService {
         //     store.dispatch({type: 'gps/clear', payload: undefined})
         // }
     }
+    isRunning: Boolean = false;
 
     constructor() {
         Location.getPermissionsAsync().then( (a) => {
@@ -29,6 +30,7 @@ export class GpsService {
     }
 
     async start() {
+        this.isRunning = true;
         const options: Location.LocationTaskOptions = {accuracy: Location.Accuracy.BestForNavigation}
         this.watchLocation = await Location.watchPositionAsync(options, (opts) => {
             if (opts) {

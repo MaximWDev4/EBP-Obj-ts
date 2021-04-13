@@ -51,6 +51,10 @@ export type ObjStackParamList ={
     Root: undefined;
 }
 
+export type RevisionStackParamList = {
+    Menu: Data;
+}
+
 export type StartScreenRouteProp = RouteProp<RootStackParamList, 'Start'>;
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
 export type WelcomeScreenRouteProp = RouteProp<RootStackParamList, 'Welcome'>;
@@ -134,7 +138,5 @@ export type UndefProps = {
         | SignStackNavigationProp
         | UploadScreenNavigationProp
         | ObjStackNavigationProp
-
-
 }
 

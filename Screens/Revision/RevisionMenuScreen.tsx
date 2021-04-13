@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import {SignDataProps} from "../Navigation/NavTypes";
-import {MyButton} from "../Share/components";
+import {SignDataProps} from "../../../ebp-react-ts/Navigation/NavTypes";
+import {MyButton} from "../../../ebp-react-ts/Share/components";
 
-export function RevisionScreen({route, navigation}: SignDataProps) {
+export function RevisionMenuScreen({route, navigation}: SignDataProps) {
     const goTo = (destination: string) => {
         switch (destination){
             case '': navigation.navigate('Root');
@@ -28,7 +28,7 @@ export function RevisionScreen({route, navigation}: SignDataProps) {
 }
 
 
-RevisionScreen.navigationOptions = {
+RevisionMenuScreen.navigationOptions = {
     title: 'Ревизия',
 };
 

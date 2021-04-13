@@ -1,12 +1,11 @@
 /// <reference path="../node.d.ts"/>
 
-import {Alert, Platform} from 'react-native';
+import { Alert } from 'react-native';
 import DB from "./storage";
 import * as FileSystem from 'expo-file-system';
-import * as Permissions from "expo-permissions";
+import {Asset, useAssets} from "expo-asset";
 import * as ImagePicker from "expo-image-picker";
 import {store} from "../Store";
-
 
 const getUrl = (action: any) => {
 
@@ -61,13 +60,6 @@ const getUrl = (action: any) => {
 	return base;
 }
 
-async function askPermission() {
-	const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-	if (status !== 'granted') {
-		alert('Sorry, we need camera roll permissions to make this work!');
-	}
-	return status === 'granted'
-}
 
 const addRecord = async (type: 'znak' | 'obj', body: string, img_old?: string[], img_new?: string[]) => {
 	let db = new DB;
@@ -81,6 +73,15 @@ const addRecord = async (type: 'znak' | 'obj', body: string, img_old?: string[],
 	}
 
 }
+
+async function askPermission() {
+	const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+	if (status !== 'granted') {
+		alert('Sorry, we need camera roll permissions to make this work!');
+	}
+	return status === 'granted'
+}
+
 
 const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
 
@@ -145,59 +146,73 @@ const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
 // 	}
 // 	else {
 // 		return oldValue
+// 		return oldValue
 // 	}
 // }
 
 
-const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj')  => {
-	let db = new DB;
-	console.log(record)
-	if ( (record.imageBefore && record.imageAfter && !!record.imageBefore[0] && !!record.imageAfter[0]) || (!!record.img_old && !!record.img_new && !!JSON.parse(record.img_old)[0] && !!JSON.parse(record.img_new)[0])) {
-		const img_old: string[] = record.imageBefore ? record.imageBefore : JSON.parse(record.img_old);
-		const img_new: string[] = record.imageAfter ? record.imageAfter : JSON.parse(record.img_new);
-		let Token: string = store.getState().system.token;
-		const url = getUrl(rout == 'znak' ? 'foto' : 'foto-obj');
-
-		const formData = new FormData();
-		let imageExists: boolean[] = [];
-		let image2Exists: boolean[] = [];
-		let img;
-		try {
-			for (let i = 0; i < img_old.length && i < img_new.length; i++) {
-				img = img_old[i];
-				if ((await FileSystem.getInfoAsync(img)).exists) {
-					imageExists.push(true);
-				} else {
-					imageExists.push(false);
-				}
-				img = img_new[i];
-				if ((await FileSystem.getInfoAsync(img)).exists) {
-					image2Exists.push(true);
-				} else {
-					image2Exists.push(false);
-				}
+const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj') : Promise<string>  => {
+	const Token = store.getState().system.token;
+	const img_old: string[] = record.imageBefore ?? JSON.parse(record.img_old);
+	const img_new: string[] = record.imageAfter ?? JSON.parse(record.img_old);
+	const url = getUrl(rout == 'znak' ? 'foto' : 'foto-obj');
+	const formData = new FormData();
+	let imageExists: boolean[] = [];
+	let image2Exists: boolean[] = [];
+	let img;
+	console.log('sending phitos');
+	try {
+		for (let i = 0; i < img_old.length; i++) {
+			img = img_old[i];
+			if ((await FileSystem.getInfoAsync(img)).exists) {
+				imageExists.push(true);
+			} else {
+				imageExists.push(false);
 			}
-		} catch (e) {
-			imageExists = [];
-			image2Exists = [];
 		}
-		try {
-			let res: boolean | number = false;
-			if (rout == 'znak') {
-				formData.append('Token', Token);
-				formData.append('ID', sid.toString());
-				if (imageExists[0] && image2Exists[0]) {
-					formData.append('IMG_OLD', {// @ts-ignore
-						uri: img_old[0],
-						name: `image_old.${img_old[0].substr(img_old[0].length - 3)}`,
-						type: `image/${img_old[0].substr(img_old[0].length - 3)}`
-					});
-					formData.append('IMG_NEW', {// @ts-ignore
-						uri: img_new[0],
-						name: `image_new.${img_new[0].substr(img_new[0].length - 3)}`,
-						type: `image/${img_new[0].substr(img_new[0].length - 3)}`
-					});
-				}
+	} catch (e) {
+		console.log(e);
+		imageExists = [];
+	}
+	try {
+		for (let i = 0; i < img_new.length; i++) {
+			img = img_new[i];
+			if ((await FileSystem.getInfoAsync(img)).exists) {
+				image2Exists.push(true);
+			} else {
+				image2Exists.push(false);
+			}
+		}
+	} catch (e) {
+		console.log(e);
+		image2Exists = [];
+	}
+	try {
+		let res: boolean | number = false;
+		if (rout == 'znak') {
+			formData.append('Token', Token);
+			formData.append('ID', sid.toString());
+			if (imageExists[0]) {
+				formData.append('IMG_OLD', {// @ts-ignore
+					uri: img_old[0],
+					name: `image_old.${img_old[0].substr(img_old[0].length - 3)}`,
+					type: `image/${img_old[0].substr(img_old[0].length - 3)}`
+				});
+			}
+			if (image2Exists[0]) {
+				formData.append('IMG_NEW', {// @ts-ignore
+					uri: img_new[0],
+					name: `image_new.${img_new[0].substr(img_new[0].length - 3)}`,
+					type: `image/${img_new[0].substr(img_new[0].length - 3)}`
+				});
+			} else {
+				formData.append('IMG_NEW', {// @ts-ignore
+					uri: Asset.fromModule(require('../assets/images/maintaining.png')).uri,
+					name: `image_new.maintaining.png`,
+					type: `image/maintaining.png`
+				});
+			}
+			if (imageExists[0]) {
 				try {
 					await fetch(url, {
 						method: 'post',
@@ -214,6 +229,7 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
 							res = responseJson.code;
 
 							if (res == 0) {
+								let db = new DB;
 								await db.deleteZnak(record, () => null);
 							} else {
 								Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
@@ -227,78 +243,88 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
 					return e
 				}
 				return 'success'
-
-			} else if (rout == 'obj') {
-				if (imageExists.length && image2Exists.length) {
-					formData.append('Token', Token);
-					formData.append('ID', sid.toString());
-					for (let i = 0; i < img_old.length && i < img_new.length; i++) {
-						if (imageExists[i]) {
-							console.log('set1')
-							formData.append('IMG_OLD', {// @ts-ignore
-								uri: img_old[i],
-								name: `image_old.${img_old[i].substr(img_old[i].length - 3)}`,
-								type: `image/${img_old[i].substr(img_old[i].length - 3)}`
-							});
-						}
-						if (image2Exists[i]) {
-							console.log('set2')
-							formData.append('IMG_NEW', {// @ts-ignore
-								uri: img_new[i],
-								name: `image_new.${img_new[i].substr(img_new[i].length - 3)}`,
-								type: `image/${img_new[i].substr(img_new[i].length - 3)}`
-							});
-						}
-						if (imageExists[i] && image2Exists[i]) {
-							try {
-								await fetch(url, {
-									method: 'post',
-									headers: {
-										"Content-Type": "multipart/form-data"
-									},
-									body: formData,
+			}
+		} else if (rout == 'obj') {
+			console.log(imageExists);
+			if (imageExists.length > 0) {
+				formData.append('Token', Token);
+				formData.append('ID', sid.toString());
+				for (let i = 0; i < img_old.length || i < img_new.length; i++) {
+					let formDatahas1 = false;
+					let formDatahas2 = false;
+					if (imageExists[i]) {
+						console.log('set1')
+						formData.append('IMG_OLD', {// @ts-ignore
+							uri: img_old[i],
+							name: `image_old.${img_old[i].substr(img_old[i].length - 3)}`,
+							type: `image/${img_old[i].substr(img_old[i].length - 3)}`
+						});
+						formDatahas1 = true;
+					}
+					if (image2Exists[i]) {
+						console.log('set2')
+						formData.append('IMG_NEW', {// @ts-ignore
+							uri: img_new[i],
+							name: `image_new.${img_new[i].substr(img_new[i].length - 3)}`,
+							type: `image/${img_new[i].substr(img_new[i].length - 3)}`
+						});
+						formDatahas2 = true;
+					} else {
+						formData.append('IMG_NEW', {// @ts-ignore
+							uri: Asset.fromModule(require('../assets/images/maintaining.png')).uri,
+							name: `image_new.maintaining.png`,
+							type: `image/maintaining.png`
+						});
+						formDatahas2 = true;
+					}
+					if (formDatahas1 && formDatahas2) {
+						try {
+							await fetch(url, {
+								method: 'post',
+								headers: {
+									"Content-Type": "multipart/form-data"
+								},
+								body: formData,
+							})
+								.then((response) => {
+									return response.json();
 								})
-									.then((response) => {
-										return response.json();
-									})
-									.then(async (responseJson) => {
-										console.log(responseJson);
-										res = responseJson.code;
+								.then(async (responseJson) => {
+									res = responseJson.code;
 
-										if (res == 0) {
-											let db = new DB;
-											await db.deleteZnak(record, () => null);
-										} else {
-											Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
-											Promise.reject(('Response Failed' + i)).then((e) => {
-												console.log(e)
-											}, (s) => {
-												console.log(s)
-											})
-											return "fail"
-										}
-									})
-									.catch(err => {
-										return err;
-									})
-							} catch (e) {
-								alert(e);
-								return e
-							}
+									if (res == 0) {
+										let db = new DB;
+										await db.deleteZnak(record, () => null);
+									} else {
+										Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
+										Promise.reject(('Response Failed' + i)).then((e) => {
+											console.log(e)
+										}, (s) => {
+											console.log(s)
+										})
+										return "fail"
+									}
+								})
+								.catch(err => {
+									return err;
+								})
+						} catch (e) {
+							console.log(e);
+							alert(e);
+							return e
 						}
 					}
-				} else {
-					return 'Ошибка: Не найдены изображения'
 				}
+			} else {
+				return 'Ошибка: Не найдено изображение до'
 			}
-			return 'success'
-		} catch (e) {
-			alert(e)
-			return 'failed'
 		}
-	} else {
-		db.deleteZnak(record, () => null);
-		return 'Нет фото, запись удалена'
+		return 'success'
+	} catch (e) {
+		console.log(e);
+		throw (e);
+	} finally {
+		console.log(formData);
 	}
 }
 

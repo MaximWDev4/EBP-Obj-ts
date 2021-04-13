@@ -5,7 +5,7 @@ import * as Permissions from 'expo-permissions';
 import {BarCodeScanner} from 'expo-barcode-scanner';
 
 import { Alert } from 'react-native';
-import {SignDataProps} from "../Navigation/NavTypes";
+import {SignDataProps} from "../../Navigation/NavTypes";
 import {useEffect} from "react";
 
 

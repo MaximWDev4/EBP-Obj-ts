@@ -5,7 +5,8 @@ import {Data, UndefProps} from "../Navigation/NavTypes";
 import {useEffect} from "react";
 import {Button} from "react-native-elements";
 import {store} from "../Store";
-
+import {logout} from "./MainScreen";
+import {CommonActions} from "@react-navigation/native";
 
 export default function StartScreen({ navigation }: UndefProps) {
 	let Data: Data = {}
@@ -17,8 +18,8 @@ export default function StartScreen({ navigation }: UndefProps) {
 			try {
 				p1 = (await FileSystem.getInfoAsync(fileUri)).exists
 			}catch (e) {
-				Alert.alert(e);
-				navigation.replace('Login');
+				Alert.alert('Ошибка');
+				logout(navigation).then();
 			}
 			// navigation.replace('Login');
 			if (p1) {
@@ -27,7 +28,16 @@ export default function StartScreen({ navigation }: UndefProps) {
 					navigation.replace('Main')
 				});
 			} else {
-				navigation.replace('Login')
+				navigation.dispatch(
+					CommonActions.reset({
+						index: 0,
+						routes: [
+							{
+								name: 'Login'
+							}
+						]
+					})
+				)
 			}
 		}
 		asyncFunc();

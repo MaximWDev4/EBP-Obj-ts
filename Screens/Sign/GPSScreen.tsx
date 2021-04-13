@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Alert } from 'react-native';
-import {SignDataProps, GPS, Data} from "../Navigation/NavTypes";
+import {SignDataProps, GPS, Data} from "../../Navigation/NavTypes";
 import {useCallback, useEffect, useState} from "react";
-import {al, RenderGPSView} from "../Share/screensAPI";
+import {al, RenderGPSView} from "../../Share/screensAPI";
 import {useFocusEffect} from "@react-navigation/native";
-import {GpsService} from "../Share/gpsService";
-import {store} from "../Store";
+import {GpsService} from "../../Share/gpsService";
+import {store} from "../../Store";
 
 
 export default function GPSScreen ({route, navigation}: SignDataProps) {

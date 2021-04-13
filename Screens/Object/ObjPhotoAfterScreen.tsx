@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {Data, ObjDataProps} from "../Navigation/NavTypes";
+import {Data, ObjDataProps} from "../../Navigation/NavTypes";
 import {useEffect, useState} from "react";
-import {pickImage, RenderPhotoView} from "../Share/screensAPI";
+import {pickImage, RenderPhotoView} from "../../Share/screensAPI";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-import {askPermission} from "../Share/func";
+import {askPermission} from "../../Share/func";
 
 export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
     const Data : Data = route.params;
@@ -28,7 +28,7 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
         catch (e) {
             console.log(e)
         }
-        askPermission().then( stat => setHasPermission(stat));
+        askPermission().then( (stat: any) => setHasPermission(stat));
     }, [])
 
     const deleteFoto = async (id: number) => {
@@ -101,7 +101,7 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
                             width: 32,
                             height: 32,
                         }}
-                               source={require('../assets/images/delete.png')}/>
+                               source={require('../../assets/images/delete.png')}/>
                     </TouchableOpacity>
                 </View>
 

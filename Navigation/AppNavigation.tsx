@@ -10,19 +10,19 @@ import {
     SignStackParamList
 } from "./NavTypes";
 import StartScreen from "../Screens/StartScreen";
-import QRScreen from "../Screens/QRScreen";
+import QRScreen from "../Screens/Sign/QRScreen";
 import {UploadScreen} from "../Screens/UploadScreen";
 import {WelcomeScreen} from "../Screens/WelcomeScreen";
 import MainScreen from "../Screens/MainScreen";
-import GPSScreen from "../Screens/GPSScreen";
+import GPSScreen from "../Screens/Sign/GPSScreen";
 // import {RevisionScreen} from "../Screens/RevisionScreen";
-import ZnakFotoAfterScreen from "../Screens/ZnakFotoAfterScreen";
-import ZnakScreen from "../Screens/ZnakScreen";
-import ZnakFotoBeforeScreen from "../Screens/ZnakFotoBeforeScreen";
-import ObjPhotoBeforeScreen from "../Screens/ObjPhotoBeforeScreen";
-import ObjPhotoAfterScreen from "../Screens/ObjPhotoAfterScreen";
-import ObjUpload from "../Screens/UploadObj";
-import ObjGPSScreen from "../Screens/ObjGPSScreen";
+import ZnakFotoAfterScreen from "../Screens/Sign/ZnakFotoAfterScreen";
+import ZnakScreen from "../Screens/Sign/ZnakScreen";
+import ZnakFotoBeforeScreen from "../Screens/Sign/ZnakFotoBeforeScreen";
+import ObjPhotoBeforeScreen from "../Screens/Object/ObjPhotoBeforeScreen";
+import ObjPhotoAfterScreen from "../Screens/Object/ObjPhotoAfterScreen";
+import ObjUpload from "../Screens/Object/UploadObj";
+import ObjGPSScreen from "../Screens/Object/ObjGPSScreen";
 import {Home} from "../Share/components";
 import {CommonActions} from "@react-navigation/native";
 

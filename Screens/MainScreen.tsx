@@ -9,27 +9,53 @@ import {useEffect, useState} from "react";
 import {CommonActions} from "@react-navigation/native";
 import {store} from "../Store";
 
+export const logout = async(navigation: any) => {
+
+	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'Token');
+	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'roles');
+	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'gost');
+	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'tiporaz');
+	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'krepl');
+	store.dispatch({type: 'system/clear-token', payload: ''})
+	navigation.dispatch(
+		CommonActions.reset({
+			index: 0,
+			routes: [
+				{
+					name: 'Login'
+				}
+			]
+		})
+	)
+}
 
 export default function MainScreen({ route, navigation }: UndefProps) {
-	// const gpsService = Data.gpsService;
 	const [count, setCount] = useState<number | string>('-');
 	let db = new DB;
 	const [rolesSource, setRolesSource] = useState('');
 	let SignButton = null;
 	let objectButton = null;
 	let revision = null;
-
 	useEffect( ()=> {
 		const t =  FileSystem.documentDirectory + 'Token';
 		FileSystem.readAsStringAsync(t)
 			.then((data)=> {
 
 				if (data === ''){
-					navigation.replace('Login');
+					navigation.dispatch(
+						CommonActions.reset({
+							index: 0,
+							routes: [
+								{
+									name: 'Login'
+								}
+							]
+						})
+					)
 				}
 			})
 			.catch((err) => {
-			Alert.alert('Непредвиденная ошибка', err);
+			Alert.alert('Непредвиденная ошибка');
 			navigation.replace('Login');
 		});
 		const fileUri = FileSystem.documentDirectory + 'roles';
@@ -47,27 +73,6 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 			setCount(savedCount)
 		});
 	})
-
-	const logout = async() => {
-
-		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'Token');
-		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'roles');
-		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'gost');
-		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'tiporaz');
-		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'krepl');
-		store.dispatch({type: 'system/clear-token', payload: ''})
-		navigation.dispatch(
-			CommonActions.reset({
-				index: 5,
-				routes: [
-					{
-						name: 'Login'
-					}
-				]
-			})
-		)
-	}
-
 
 	const maintainSign = () => {
 		Alert.alert(
@@ -273,7 +278,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 				<Button
 					title='Выйти из аккаунта'
 					onPress={() => {
-						logout().then();
+						logout(navigation).then();
 					}}
 
 					//onPress={() => {

@@ -3,29 +3,28 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { Alert } from 'react-native';
 import { Picker } from '@react-native-community/picker';
 import * as FileSystem from 'expo-file-system';
-import {addRecord, getUrl, sendPhoto} from '../Share/func';
-import DB from '../Share/storage'
-import {Data, ObjDataProps, SignDataProps} from "../Navigation/NavTypes";
+import {addRecord, getUrl, sendPhoto} from '../../../ebp-react-ts/Share/func';
+import DB from '../../../ebp-react-ts/Share/storage'
+import {Data, SignDataProps} from "../../../ebp-react-ts/Navigation/NavTypes";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import {CommonActions} from "@react-navigation/native";
-import {ModalActivityIndicator} from "../Share/components";
-import {store} from "../Store";
+import {ModalActivityIndicator} from "../../../ebp-react-ts/Share/components";
+
 
 export type listItem ={
 	"id": number,
 	"name": string
 }
 
-export default function ObjUpload({navigation, route}: ObjDataProps) {
+export default function ObjUpload({navigation, route}: SignDataProps) {
 	const [vidRabSource, setVidRabSource] = useState<listItem[]>([]);
 	const [objTypeSource, setObjTypeSource] = useState<listItem[]>([]);
 	const [objType, setObjType] = useState<string|number>('');
 	const [vidRab, setVidRab] = useState<string|number>('');
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
-	const Token: string = store.getState().system.token;
-	let timeout: any;
+	const db = new DB;
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
 		await NetInfo.fetch().then(state => {
@@ -40,30 +39,35 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 		getObjType();
 
 	},[])
-
-	useEffect(() => {
-		return clearTimeout(timeout)
-	})
-
-
 	const sendData = () => {
 
 		let body =
-			'Token=' + Token + '&' +
+			'Token=' + Data.Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'TYPE=' + objType + '&' +
 			'VIDR=' + vidRab;
-		const saveRecord = async (body: any) => {
-			let saveBefore = Data.imageBefore;
-			let saveAfter = Data.imageAfter;
-			await addRecord('znak', body, saveBefore, saveAfter)
-		}
-		const url = getUrl('saveobj');
 
+		const url = getUrl('saveobj');
+		// const saveImage = async (Data: Data, id: number) => {
+		// 	let ImgStorage = FileSystem.documentDirectory + 'Image_';
+		// 	let uri = id === 1 ? Data.imageBefore : Data.imageAfter;
+		// 	let destination = ImgStorage + uri?.substr(uri?.length - 10);
+		// 	if (uri) {
+		// 		let downloadObject = FileSystem.moveAsync({
+		// 				from: uri,
+		// 				to: destination
+		// 			}
+		// 		);
+		// 		await downloadObject;
+		//
+		// 		return destination;
+		// 	} else{
+		// 		return ''
+		// 	}
+		// }
 		const next = (response: any) => {
 			setLoading(false);
-			clearTimeout(timeout);
 			Data.gps = undefined;
 			Data.imageBefore = [];
 			Data.imageAfter = [];
@@ -89,26 +93,6 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 				if (
 					state
 				) {
-					timeout = setTimeout(() => {
-						setLoading(false)
-						saveRecord(body).then(() => {
-							Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
-								{
-									text: 'Вернуться на главный экран',
-									onPress: () => navigation.dispatch(
-										CommonActions.reset({
-											index: 5,
-											routes: [
-												{
-													name: 'Root'
-												}
-											]
-										})
-									)
-								}
-							])
-						});
-					}, 30000)
 					console.log(body);
 					fetch(url, {
 						method: 'post',
@@ -122,25 +106,38 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 							return response.json()
 						})
 						.then((responseJson) => {
-							console.log(responseJson);
 							if (responseJson.code == 0) {
-								console.log('start sending photo')
-							sendPhoto(responseJson.id, Data, 'obj').then(() => next((responseJson: any) =>  { console.log('end sending: ',responseJson)}));
+							sendPhoto(responseJson.id, Data, Data.Token, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
 							} else {
 								//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
 									{
 										text: 'Вернуться на главный экран',
-										onPress: () => navigation.dispatch(
-											CommonActions.reset({
-												index: 5,
-												routes: [
+										onPress: () => {
+											const saveRecord = async () => {
+												let saveBefore = Data.imageBefore;
+												let saveAfter = Data.imageAfter;
+												addRecord('obj', body, saveBefore, saveAfter).then((data) => {
+												});
+											}
+											saveRecord().then(() => {
+												Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище', [
 													{
-														name: 'Root'
+														text: 'Вернуться на главный экран',
+														onPress: () => navigation.dispatch(
+															CommonActions.reset({
+																index: 0,
+																routes: [
+																	{
+																		name: 'Root'
+																	}
+																]
+															})
+														)
 													}
-												]
-											})
-										)
+												]);
+											});
+										}
 									},
 									{
 										text: 'Повторить попытку',
@@ -154,6 +151,29 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 						// 		}
 						// })
 						.catch(err => {
+							const saveRecord = async () => {
+								let saveBefore = Data.imageBefore;
+								let saveAfter = Data.imageAfter;
+								addRecord('obj', body, saveBefore, saveAfter).then((data) => {
+								});
+							}
+							saveRecord().then(() => {
+								Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище', [
+									{
+										text: 'Вернуться на главный экран',
+										onPress: () => navigation.dispatch(
+											CommonActions.reset({
+												index: 0,
+												routes: [
+													{
+														name: 'Root'
+													}
+												]
+											})
+										)
+									}
+								]);
+							});
 							setLoading(false);
 							alert(err.toString());
 							//err.text().then( errorMessage => {
@@ -162,13 +182,19 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 						})
 				}
 				else {
-					saveRecord(body).then(() => {
+					const saveRecord = async () => {
+						let saveBefore = Data.imageBefore;
+						let saveAfter = Data.imageAfter;
+						addRecord('obj', body, saveBefore, saveAfter).then((data) => {
+						});
+					}
+					saveRecord().then(() => {
 						Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище', [
 							{
 								text: 'Вернуться на главный экран',
 								onPress: () => navigation.dispatch(
 									CommonActions.reset({
-										index: 5,
+										index: 0,
 										routes: [
 											{
 												name: 'Root'
@@ -184,7 +210,7 @@ export default function ObjUpload({navigation, route}: ObjDataProps) {
 
 		} catch (e) {
 			setLoading(false);
-			alert(e);
+			alert('Ошибка');
 		}
 
 	}

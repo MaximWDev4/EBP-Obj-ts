@@ -4,17 +4,14 @@ import NetInfo from "@react-native-community/netinfo";
 
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
-import {Data, MainDataProps} from "../Navigation/NavTypes";
+import {Data, UndefProps} from "../Navigation/NavTypes";
 import {useState} from "react";
 
 
-export function WelcomeScreen({navigation, route}: MainDataProps) {
+export function WelcomeScreen({navigation, route}: UndefProps) {
 	const [errorMessage, setErrorMessage] = useState('');
 	const [net, setNet] = useState(false);
 	const [gps, setGps] = useState(false);
-
-
-	const Data: Data = route.params;
 
 	const checkNetwork = () => {
 		NetInfo.fetch().then(state => {
@@ -32,7 +29,7 @@ export function WelcomeScreen({navigation, route}: MainDataProps) {
   const _getLocationAsync = async () => {
     let { status } = (await Permissions.askAsync(Permissions.LOCATION)).permissions;
 
-    if (status !== 'granted') {
+    if (status.status !== 'granted') {
       setErrorMessage('Permission to access location was denied')
     }
 
@@ -98,7 +95,7 @@ export function WelcomeScreen({navigation, route}: MainDataProps) {
 		if (next) {
 			//props.navigation.navigate('Main', {  })
 			//props.navigation.navigate('Main', Data)
-			navigation.replace('Main', Data)
+			navigation.replace('Main')
 		} else {
 			checkSatus();
 		}

@@ -28,8 +28,9 @@ export default function App() {
     };
     let unsubscribe2 = store.subscribe(() => {
       if (store.getState().system.token !== '') {
-        gpsService.start().then();
-        unsubscribe2();
+        if (!gpsService.isRunning) {
+          gpsService.start().then();
+        }
       }
     })
     const backHandler = BackHandler.addEventListener(
@@ -37,7 +38,7 @@ export default function App() {
         backAction
     );
 
-    return () => { backHandler.remove(); }
+    return () => { backHandler.remove(); unsubscribe2();}
   }, []);
   useEffect(() => {
     let asyncFunc = async () => {
@@ -46,7 +47,7 @@ export default function App() {
       try {
         p1 = (await FileSystem.getInfoAsync(fileUri)).exists
       }catch (e) {
-        Alert.alert(e);
+        Alert.alert('Ошибка');
       }
       // navigation.replace('Login');
       if (p1) {
@@ -74,7 +75,6 @@ export default function App() {
         asyncFunc();
       }
   }, [isReady]);
-
   if (!isReady) {
     return <ModalActivityIndicator show={!isReady}/>
   }

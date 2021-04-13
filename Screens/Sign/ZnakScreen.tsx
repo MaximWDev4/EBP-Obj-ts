@@ -3,13 +3,14 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { Alert } from 'react-native';
 import { Picker } from '@react-native-community/picker';
 import * as FileSystem from 'expo-file-system';
-import {addRecord, getUrl, sendPhoto} from '../Share/func';
+import {addRecord, getUrl, sendPhoto} from '../../../ebp-react-ts/Share/func';
 import { CommonActions } from '@react-navigation/native';
-import {Data, SignDataProps} from "../Navigation/NavTypes";
+import {Data, SignDataProps} from "../../../ebp-react-ts/Navigation/NavTypes";
 import { useEffect, useState } from "react";
-import * as NetworkExpo from 'expo-network';
-import {ModalActivityIndicator} from "../Share/components";
-import {store} from "../Store";
+import NetInfo from "@react-native-community/netinfo";
+import {ModalActivityIndicator} from "../../../ebp-react-ts/Share/components";
+
+type gostType = {id: number, name: string}[]
 
 const gostTypes = [
 	{ id: 1, name: 'Предупреждающие'},
@@ -26,23 +27,17 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const [tiporaz, setTiporaz] = useState<number | string>(0);
 	const [krepl, setKrepl] = useState< number | string >(0);
 	const [gostType, setGostType] = useState(1);
-	const gostTypeSource = gostTypes;
+	const [gostTypeSource, setGostTypeSource] = useState<gostType>(gostTypes);
 	const [gostSource, setGostSource] = useState<any[]>([]);
 	const [tiporazSource, setTiporazSource] = useState<string[]>([]);
 	const [kreplSource, setKreplSource] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
-	const Token: string = store.getState().system.token;
-	let timeout: any;
 	const Network = async (): Promise<boolean> => {
-		let check: undefined | boolean = false;
-		await NetworkExpo.getNetworkStateAsync().then((state: NetworkExpo.NetworkState) => {
-			check = state.isConnected
-				 && state.isInternetReachable
-				 && (state.type == NetworkExpo.NetworkStateType.CELLULAR
-					|| state.type == NetworkExpo.NetworkStateType.WIFI
-					|| state.type == NetworkExpo.NetworkStateType.WIMAX)
-	});
+		let check: boolean = false;
+		await NetInfo.fetch().then(state => {
+			check = state.isConnected;
+		});
 		return check;
 	}
 
@@ -54,13 +49,8 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 
 	},[])
 
-	useEffect(() => {
-		return clearTimeout(timeout)
-	})
-
-	const next = () => {
+	const next = (responseJson: any) => {
 		setLoading(false);
-		clearTimeout(timeout)
 		Data.gps = undefined;
 		Data.imageBefore = undefined;
 		Data.imageAfter = undefined;
@@ -68,30 +58,17 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 		Alert.alert('OK', 'Отчет успешно отправлен', [
 			{
 				text: 'Вернуться на главный экран',
-				onPress: () => navigation.dispatch(
-					CommonActions.reset({
-						index: 0,
-						routes: [
-							{
-								name: 'Root'
-							}
-						]
-					})
-				)
+				onPress: () => navigation.replace('Root')
 			}
 		]);
 	}
 
-	const saveRecord = async (body: any) => {
-		let saveBefore = Data.imageBefore;
-		let saveAfter = Data.imageAfter;
-		await addRecord('znak', body, saveBefore, saveAfter)
-	}
-
 	const sendData = () => {
 
+
+
 		let body =
-			'Token=' + Token + '&' +
+			'Token=' + Data.Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'QRDATA=' + Data.qrcode + '&' +
@@ -123,26 +100,6 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 				if (
 					state
 				) {
-					timeout = setTimeout(() => {
-						setLoading(false)
-						saveRecord(body).then(() => {
-							Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
-								{
-									text: 'Вернуться на главный экран',
-									onPress: () => navigation.dispatch(
-										CommonActions.reset({
-											index: 0,
-											routes: [
-												{
-													name: 'Root'
-												}
-											]
-										})
-									)
-								}
-							])
-						});
-					}, 30000)
 					fetch(url, {
 						method: 'post',
 						headers: {
@@ -155,9 +112,51 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-								sendPhoto(responseJson.id, Data, "znak").then(() => next());
+								sendPhoto(responseJson.id, Data, Data.Token, "znak").then(() => next(responseJson));
 							} else {
+
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
+									{
+										text: 'Сохранить и вернуться на главный экран',
+										onPress: () => {
+											const saveRecord = async () => {
+												let saveBefore = Data.imageBefore;
+												let saveAfter = Data.imageAfter;
+												await addRecord('znak', body, saveBefore, saveAfter)
+											}
+											saveRecord().then(() => {
+												Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+													{
+														text: 'Вернуться на главный экран',
+														onPress: () => navigation.dispatch(
+															CommonActions.reset({
+																index: 0,
+																routes: [
+																	{
+																		name: 'Root'
+																	}
+																]
+															})
+														)
+													}
+												])
+											});
+										}
+									},
+									{
+										text: 'Повторить попытку',
+									},
+								]);
+							}
+						})
+						.catch(err => {
+							const saveRecord = async () => {
+								let saveBefore = Data.imageBefore;
+								let saveAfter = Data.imageAfter;
+								await addRecord('znak', body, saveBefore, saveAfter)
+							}
+							saveRecord().then(() => {
+								Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
 									{
 										text: 'Вернуться на главный экран',
 										onPress: () => navigation.dispatch(
@@ -170,20 +169,20 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 												]
 											})
 										)
-									},
-									{
-										text: 'Повторить попытку',
-									},
-								]);
-							}
-						})
-						.catch(err => {
+									}
+								])
+							});
 							setLoading(false);
 							Alert.alert('Непредвиденная ошибка', err.toString());
 						})
 				}
 				else {
-					saveRecord(body).then(() => {
+					const saveRecord = async () => {
+						let saveBefore = Data.imageBefore;
+						let saveAfter = Data.imageAfter;
+						await addRecord('znak', body, saveBefore, saveAfter)
+					}
+					saveRecord().then(() => {
 						Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
 							{
 								text: 'Вернуться на главный экран',
@@ -198,14 +197,14 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 									})
 								)
 							}
-							])
+						])
 					});
 				}
 			})
 
 		} catch (e) {
 			setLoading(false);
-			alert(e);
+			alert('Ошибка');
 		}
 
 	}
@@ -409,6 +408,44 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 }
 
 
+
+//
+// ZnakScreen.navigationOptions = {
+//   title: 'Znak',
+// };
+
+//const styles = StyleSheet.create({
+  //centerText: {
+	//flex: 1,
+	//fontSize: 18,
+	//padding: 32,
+	//color: '#777',
+  //},
+  //textBold: {
+	//fontWeight: '500',
+	//color: '#000',
+  //},
+  //buttonText: {
+	//fontSize: 21,
+	//color: 'rgb(0,122,255)',
+  //},
+  //buttonTouchable: {
+	//padding: 16,
+  //},
+  //welcome: {
+	//fontWeight: '500',
+	//color: 'green',
+  //},
+  //instructions: {
+	//fontWeight: '500',
+	//color: 'yellow',
+  //},
+
+
+
+
+
+//});
 
 const styles = StyleSheet.create({
     container: {

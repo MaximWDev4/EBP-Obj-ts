@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {GestureResponderEvent, Image, ListRenderItem, Text, TouchableOpacity, View} from 'react-native';
 import * as Permissions from 'expo-permissions';
-import {Data, SignDataProps} from "../Navigation/NavTypes";
+import {Data, SignDataProps} from "../../Navigation/NavTypes";
 import {useEffect, useState} from "react";
-import {pickImage, RenderPhotoView} from "../Share/screensAPI";
+import {pickImage, RenderPhotoView} from "../../Share/screensAPI";
 import * as FileSystem from "expo-file-system";
-import {askPermission} from "../Share/func";
+import {askPermission} from "../../Share/func";
 
 
 export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps) {
@@ -82,7 +82,7 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 							width: 32,
 							height: 32,
 						}}
-							   source={require('../assets/images/delete.png')}/>
+							   source={require('../../assets/images/delete.png')}/>
 					</TouchableOpacity>
 				</View>
 

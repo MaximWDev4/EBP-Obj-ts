@@ -70,7 +70,7 @@ export function LoginScreen ({route, navigation}: UndefProps) {
 					} else {
 						//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 						//Alert.alert('Error', responseJson.code + ': ' + responseJson.msg );
-						Alert.alert('Error ' + responseJson.code + ': ', responseJson.msg);
+						Alert.alert('Error ' + responseJson.code.toString() + ': ', responseJson.msg.toString());
 					}
 
 				})
@@ -202,7 +202,7 @@ export function LoginScreen ({route, navigation}: UndefProps) {
 
 				}).catch((error) => Alert.alert('Неверный логин или пароль'));
 		} catch (e) {
-			alert(e);
+			alert('Ошибка');
 		}
 	}
 	return (
