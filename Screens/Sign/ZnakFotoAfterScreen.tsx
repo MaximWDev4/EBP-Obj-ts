@@ -100,14 +100,19 @@ export default function ZnakFotoAfterScreen ({route, navigation}: SignDataProps)
 		)
 	}
 
-	return (RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, async (s, result) => {
+	return (RenderPhotoView({ im: images, next: next, IM: IM, pickNewImage:  (type) => pickImage(type, hasPermission, (s, result) => {
 				if (s) {
-					setImages([result]);
+					try {
+						setImages([...images, result]);
+					} catch (e) {
+						alert(e)
+					}
 				} else {
-					await askPermission()
 					console.log(result);
 				}
-			})
+			}), after: true, skip: () => {
+				// setImages([Asset.fromModule(require('../../assets/images/maintaining.png')).uri]);
+				next()}}
 		)
 	)
 

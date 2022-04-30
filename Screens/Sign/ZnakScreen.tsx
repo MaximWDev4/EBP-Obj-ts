@@ -3,12 +3,13 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { Alert } from 'react-native';
 import { Picker } from '@react-native-community/picker';
 import * as FileSystem from 'expo-file-system';
-import {addRecord, getUrl, sendPhoto} from '../../../ebp-react-ts/Share/func';
+import {addRecord, getUrl, sendPhoto} from '../../Share/func';
 import { CommonActions } from '@react-navigation/native';
-import {Data, SignDataProps} from "../../../ebp-react-ts/Navigation/NavTypes";
+import {Data, SignDataProps} from "../../Navigation/NavTypes";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
-import {ModalActivityIndicator} from "../../../ebp-react-ts/Share/components";
+import {ModalActivityIndicator} from "../../Share/components";
+import {store} from "../../Store";
 
 type gostType = {id: number, name: string}[]
 
@@ -33,6 +34,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 	const [kreplSource, setKreplSource] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
+	const Token = store.getState().system.token;
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
 		await NetInfo.fetch().then(state => {
@@ -58,7 +60,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 		Alert.alert('OK', 'Отчет успешно отправлен', [
 			{
 				text: 'Вернуться на главный экран',
-				onPress: () => navigation.replace('Root')
+				onPress: () => navigation.dangerouslyGetParent()?.navigate('Root')
 			}
 		]);
 	}
@@ -68,7 +70,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 
 
 		let body =
-			'Token=' + Data.Token + '&' +
+			'Token=' + Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'QRDATA=' + Data.qrcode + '&' +
@@ -112,7 +114,7 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-								sendPhoto(responseJson.id, Data, Data.Token, "znak").then(() => next(responseJson));
+								sendPhoto(responseJson.id, Data, "znak").then(() => next(responseJson));
 							} else {
 
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [

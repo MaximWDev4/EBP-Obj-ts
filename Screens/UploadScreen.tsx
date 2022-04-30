@@ -85,7 +85,7 @@ export function UploadScreen ({route, navigation}: UndefProps) {
 
 	const send = async (record: any, callback: any) => {
 		try {
-			let body = 'Token=' + '45'+store.getState().system.token + '&' + record.data + '&' + 'DATE' + record.dt;
+			let body = 'Token=' + store.getState().system.token + '&' + record.data + '&' + 'DATE' + record.dt;
 
 			let id = null;
 			const sent = await sendZnakObj(body, record.type == 'znak' ? 'save' : 'saveobj');

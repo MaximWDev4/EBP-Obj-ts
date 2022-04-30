@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 
 import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions';
 import {Data, UndefProps} from "../Navigation/NavTypes";
 import {useState} from "react";
 
@@ -27,9 +26,9 @@ export function WelcomeScreen({navigation, route}: UndefProps) {
 	}
 
   const _getLocationAsync = async () => {
-    let { status } = (await Permissions.askAsync(Permissions.LOCATION)).permissions;
+    let { status } = (await Location.getPermissionsAsync());
 
-    if (status.status !== 'granted') {
+    if (status !== 'granted') {
       setErrorMessage('Permission to access location was denied')
     }
 

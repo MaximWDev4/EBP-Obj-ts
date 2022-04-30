@@ -84,7 +84,9 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 					style: 'cancel',
 				},
 				{text: 'Да', onPress: () => {
-						navigation.push('SignStack', {imageBefore: []})
+						navigation.dangerouslyGetParent()?.navigate('SignStack', {
+							params: {imageBefore: []},
+						})
 					}},
 			],
 		);
@@ -98,9 +100,10 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 				style: 'cancel',
 			},
 			{text: 'Да', onPress: () => {
-					navigation.push('ObjStack', {imageBefore: []})
-				}},
-			]
+					navigation.dangerouslyGetParent()?.navigate('ObjStack', {
+							    params: {imageBefore: []},
+				})
+			}}]
 		);
 	}
 
@@ -270,9 +273,9 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 
 			</View>
 
+
 			<View style={{
 				flex: 0.33,
-				flexDirection: 'column-reverse',
 				padding: 5,
 			}}>
 				<Button
@@ -289,7 +292,6 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 			</View>
 			<View style={{
 				flex: 0.33,
-				flexDirection: 'column-reverse',
 				padding: 5,
 			}}>
 				<Button
@@ -315,13 +317,6 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 		</View>
 	);
 }
-
-
-
-
-MainScreen.navigationOptions = {
-	title: 'Main',
-};
 
 //const styles = StyleSheet.create({
 //centerText: {

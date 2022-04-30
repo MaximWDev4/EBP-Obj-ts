@@ -3,13 +3,14 @@ import { Text, View, StyleSheet, Button } from 'react-native';
 import { Alert } from 'react-native';
 import { Picker } from '@react-native-community/picker';
 import * as FileSystem from 'expo-file-system';
-import {addRecord, getUrl, sendPhoto} from '../../../ebp-react-ts/Share/func';
-import DB from '../../../ebp-react-ts/Share/storage'
-import {Data, SignDataProps} from "../../../ebp-react-ts/Navigation/NavTypes";
+import {addRecord, getUrl, sendPhoto} from '../../Share/func';
+import DB from '../../Share/storage'
+import {Data, SignDataProps} from "../../Navigation/NavTypes";
 import { useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import {CommonActions} from "@react-navigation/native";
-import {ModalActivityIndicator} from "../../../ebp-react-ts/Share/components";
+import {ModalActivityIndicator} from "../../Share/components";
+import {store} from "../../Store";
 
 
 export type listItem ={
@@ -24,6 +25,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const [vidRab, setVidRab] = useState<string|number>('');
 	const [loading, setLoading] = useState<boolean>(false);
 	const Data: Data = route.params;
+	const Token = store.getState().system.token;
 	const db = new DB;
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
@@ -42,7 +44,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const sendData = () => {
 
 		let body =
-			'Token=' + Data.Token + '&' +
+			'Token=' + Token + '&' +
 			'GPS_X=' + Data.gps?.coords.latitude + '&' +
 			'GPS_Y=' + Data.gps?.coords.longitude + '&' +
 			'TYPE=' + objType + '&' +
@@ -107,7 +109,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 						})
 						.then((responseJson) => {
 							if (responseJson.code == 0) {
-							sendPhoto(responseJson.id, Data, Data.Token, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
+							sendPhoto(responseJson.id, Data, 'obj').then(() => next((responseJson: any) =>  { console.log(responseJson)}));
 							} else {
 								//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [

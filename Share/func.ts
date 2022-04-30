@@ -11,7 +11,8 @@ const getUrl = (action: any) => {
 
 	// let base = 'http://192.168.0.23:8091/'; //dev
 	// let base = 'http://192.168.0.16:8095/'; //dev/prod
-	let base = 'http://185.97.113.59:8095/'; // prod
+	// let base = 'http://185.97.113.59:8095/'; // prod
+	let base = 'http://217.15.180.58:8095/'; // prod
 
 	switch(action) {
 		case 'gost':

@@ -94,14 +94,17 @@ export default function ZnakFotoBeforeScreen ({navigation, route}: SignDataProps
 		console.log(images)
 	})
 
-	return (RenderPhotoView(images, next, IM,(type) => pickImage(type, hasPermission, async (s, result) => {
-			if (s) {
-				setImages([result]);
-			} else {
-				await askPermission()
-				console.log(result);
-			}
-		})
+	return (RenderPhotoView({ im: images, next: next, IM: IM, pickNewImage:  (type) => pickImage(type, hasPermission, (s, result) => {
+				if (s) {
+					try {
+						setImages([...images, result]);
+					} catch (e) {
+						alert(e)
+					}
+				} else {
+					console.log(result);
+				}
+			}), after: false}
 		)
 	)
 

@@ -107,9 +107,7 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
             )
         }
 
-    return (
-
-        RenderPhotoView(images, next, IM, (type) => pickImage(type, hasPermission, async (s, result) => {
+    return (RenderPhotoView({ im: images, next: next, IM: IM, pickNewImage:  (type) => pickImage(type, hasPermission, (s, result) => {
                 if (s) {
                     try {
                         setImages([...images, result]);
@@ -117,10 +115,9 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
                         alert(e)
                     }
                 } else {
-                    await askPermission()
                     console.log(result);
                 }
-            })
+            }), after: false}
         )
     )
 

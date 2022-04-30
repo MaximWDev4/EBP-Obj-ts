@@ -6,9 +6,9 @@ import {MyButton} from "../../Share/components";
 export function RevisionScreen({route, navigation}: SignDataProps) {
     const goTo = (destination: string) => {
         switch (destination){
-            case '': navigation.navigate('Root');
+            case '': navigation.dangerouslyGetParent()?.navigate('Root');
             break;
-            case '1': navigation.navigate('Root');
+            case '1': navigation.dangerouslyGetParent()?.navigate('Root');
         }
     }
     return(

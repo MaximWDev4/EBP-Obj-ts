@@ -68,8 +68,22 @@ const pickImage = async (type: number, hasPermision: boolean, callback: (s: bool
 // function IM (image: string, callback: (event: any) => void) {
 
 
-function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>, pickNewImage: (type: number) => void) {
+type PhotoViewProps = {
+        im: string[],
+        next: () => void,
+        IM: ListRenderItem<any>,
+        pickNewImage: (type: number) => void,
+        after: false,}
+    | {
+    im: string[],
+    next: () => void,
+    IM: ListRenderItem<any>,
+    pickNewImage: (type: number) => void,
+    after: true,
+    skip: () => void,
+}
 
+function RenderPhotoView(props: PhotoViewProps) {
     return (
         <View
             style={{
@@ -129,7 +143,7 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
                             onPress={() => {
                                 //fetchData(2)
                                 //takeFoto()
-                                pickNewImage(1 )
+                                props.pickNewImage(1)
                             }}
                         >
                         </Button>
@@ -149,7 +163,7 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
                             onPress={() => {
                                 //fetchData(2)
                                 //ZnakFotoBeforetainZnak()
-                                pickNewImage(2)
+                                props.pickNewImage(2)
                             }}
                         >
                         </Button>
@@ -158,7 +172,7 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
                 </View>
                 <View style={{height: '60%'}}>
                 <FlatList
-                    keyExtractor={item => item.toString()} data={im} renderItem={IM}
+                    keyExtractor={item => item.toString()} data={ props.im} renderItem={ props.IM}
                 />
                 </View>
             </View>
@@ -188,13 +202,23 @@ function RenderPhotoView(im: string[], next: () => void, IM: ListRenderItem<any>
                         title='Продолжить'
                         // style={{ flex: 1,
                         // }}
-                        disabled={!im.length}
+                        disabled={! props.im.length}
                         onPress={() => {
-                            next();
+                            props.next();
                         }}
                     >
                     </Button>
-
+                    {props.after && <Button
+                        title='Пропустить'
+                        // style={{ flex: 1,
+                        // }}
+                        disabled={typeof props.im !== 'undefined' ? props.im.length > 0 : true}
+                        onPress={() => {
+                            props.skip();
+                        }}
+                    >
+                    </Button>
+                    }
                 </View>
 
                 <View style={{flex: 1}}/>

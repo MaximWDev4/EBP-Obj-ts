@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Alert, BackHandler, StyleSheet, Linking} from 'react-native';
 import {NavigationContainer} from "@react-navigation/native";
-import {AppNavigation} from "./Navigation/AppNavigation";
+import {StackNavigator} from "./Navigation/AppNavigation";
 import * as FileSystem from 'expo-file-system';
 import {ModalActivityIndicator} from "./Share/components";
 import {store} from "./Store";
@@ -78,7 +78,6 @@ export default function App() {
   if (!isReady) {
     return <ModalActivityIndicator show={!isReady}/>
   }
-
   return (
         <NavigationContainer
             initialState={initialState}
@@ -89,7 +88,7 @@ export default function App() {
             }
             }
         >
-          {AppNavigation()}
+          {StackNavigator()}
         </NavigationContainer>
   );
 }

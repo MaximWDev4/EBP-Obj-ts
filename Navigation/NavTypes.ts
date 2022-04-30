@@ -23,13 +23,17 @@ export type Data = {
     // "gpsService": GpsService
 }
 
+export type StackParams = {
+    SignStack: {imageBefore: any[]};
+    ObjStack: {imageBefore: any[]};
+    Root: undefined;
+}
+
 export type RootStackParamList = {
     Start: undefined;
     Login: undefined;
     Welcome: undefined;
     Main: undefined;
-    SignStack: {imageBefore: any[]};
-    ObjStack: {imageBefore: any[]};
     // Revision: undefined;
     Upload:  undefined ;
 };
@@ -40,7 +44,6 @@ export type SignStackParamList = {
     QR: Data ;
     GPS:Data;
     Znak:Data;
-    Root: undefined;
 }
 
 export type ObjStackParamList ={
@@ -48,7 +51,6 @@ export type ObjStackParamList ={
     ObjGPS:Data;
     ObjPhotoAfter: Data
     ObjUpload: Data;
-    Root: undefined;
 }
 
 export type RevisionStackParamList = {
@@ -60,9 +62,11 @@ export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
 export type WelcomeScreenRouteProp = RouteProp<RootStackParamList, 'Welcome'>;
 export type MainScreenRouteProp = RouteProp<RootStackParamList, 'Main'>;
 export type UploadScreenRouteProp = RouteProp<RootStackParamList, 'Upload'>;
-export type SignStackRouteProp = RouteProp<RootStackParamList, 'SignStack'>;
-export type ObjStackRouteProp = RouteProp<RootStackParamList, 'ObjStack'>;
 // export type RevisionScreenRouteProp = RouteProp<RootStackParamList, 'Revision'>;
+export type StackSignStackRouteProp = RouteProp<StackParams, 'SignStack'>;
+export type StackObjParamsRouteProp = RouteProp<StackParams, 'ObjStack'>;
+export type StackRootParamsRouteProp = RouteProp<StackParams, 'Root'>;
+
 
 export type SignPhotoBeforeScreenRouteProp = RouteProp<SignStackParamList, 'SignPhotoBefore'>;
 export type QRScreenRouteProp = RouteProp<SignStackParamList, 'QR'>;
@@ -80,8 +84,10 @@ export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 
 export type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
 export type MainScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
 export type UploadScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Upload'>;
-export type SignStackNavigationProp = StackNavigationProp<RootStackParamList, 'SignStack'>;
-export type ObjStackNavigationProp = StackNavigationProp<RootStackParamList, 'ObjStack'>;
+
+export type StackSignStackNavigationProp = StackNavigationProp<StackParams, 'SignStack'>;
+export type StackObjStackNavigationProp = StackNavigationProp<StackParams, 'ObjStack'>;
+export type StackRootStackNavigationProp = StackNavigationProp<StackParams, 'Root'>;
 
 export type SignPhotoBeforeScreenNavigationProp = StackNavigationProp<SignStackParamList, 'SignPhotoBefore'>;
 export type QRScreenNavigationProp = StackNavigationProp<SignStackParamList, 'QR'>;
@@ -93,6 +99,11 @@ export type ObjPhotoBeforeScreenNavigationProp = StackNavigationProp<ObjStackPar
 export type ObjPhotoAfterScreenNavigationProp = StackNavigationProp<ObjStackParamList, 'ObjPhotoAfter'>;
 export type ObjGPSScreenNavigationProp = StackNavigationProp<ObjStackParamList, 'ObjGPS'>;
 
+
+export type StackDataProps = {
+    route: StackSignStackRouteProp | StackObjParamsRouteProp | StackRootParamsRouteProp,
+    navigation: StackSignStackNavigationProp | StackObjStackNavigationProp | StackRootStackNavigationProp,
+}
 
 export type SignDataProps = {
     route:  GPSScreenRouteProp
@@ -125,8 +136,8 @@ export type UndefProps = {
         | StartScreenRouteProp
 
         | MainScreenRouteProp
-        | SignStackRouteProp
-        | ObjStackRouteProp
+        // | SignStackRouteProp
+        // | ObjStackRouteProp
         | UploadScreenRouteProp
         | WelcomeScreenRouteProp
 
@@ -135,8 +146,8 @@ export type UndefProps = {
         | StartScreenNavigationProp
         | MainScreenNavigationProp
         | WelcomeScreenNavigationProp
-        | SignStackNavigationProp
+        // | SignStackNavigationProp
         | UploadScreenNavigationProp
-        | ObjStackNavigationProp
+        // | ObjStackNavigationProp
 }
 
