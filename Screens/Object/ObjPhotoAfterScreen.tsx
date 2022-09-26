@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Data, ObjDataProps} from "../../Navigation/NavTypes";
 import {useEffect, useState} from "react";

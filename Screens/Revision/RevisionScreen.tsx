@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import {SignDataProps} from "../../Navigation/NavTypes";
 import {MyButton} from "../../Share/components";

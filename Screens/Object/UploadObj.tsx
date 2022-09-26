@@ -1,7 +1,6 @@
-import * as React from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { Alert } from 'react-native';
-import { Picker } from '@react-native-community/picker';
+import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
 import {addRecord, getUrl, sendPhoto} from '../../Share/func';
 import DB from '../../Share/storage'
@@ -310,8 +309,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 										///fetchGost()
 										sendData()
 									}}
-									>
-                                </Button>
+									/>
 					</View>
 
 				</View>

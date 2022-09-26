@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {View, StyleSheet, Button, BackHandler} from 'react-native';
 import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';

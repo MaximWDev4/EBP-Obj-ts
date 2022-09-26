@@ -13,13 +13,21 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/5.png",
         "backgroundColor": "#FFFFFF"
       },
-      "versionCode": 140
+      "versionCode": 140,
+      "package": "com.maxdev4.ObjEBP"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "997cf8db-3eb4-4dcc-bc8f-b5e62aee3da7"
+      }
     }
   }
 }

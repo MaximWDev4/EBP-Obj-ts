@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {Alert} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 

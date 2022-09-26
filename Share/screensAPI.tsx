@@ -16,7 +16,6 @@ import {GpsService} from "./gpsService";
 import Spinner from 'react-native-loading-spinner-overlay';
 import {GPS} from "../Navigation/NavTypes";
 import {CustomModalWindow, MyButton, TextStroke} from "./components";
-import * as Permissions from "expo-permissions";
 
 
 const colors = {

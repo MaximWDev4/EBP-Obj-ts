@@ -1,9 +1,7 @@
-import * as React from 'react';
 import {StyleSheet, GestureResponderEvent, ListRenderItem, Image, View, Text, TouchableOpacity} from 'react-native';
 import {Data, SignDataProps} from "../../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {pickImage, RenderPhotoView} from "../../Share/screensAPI";
-import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import {askPermission} from "../../Share/func";

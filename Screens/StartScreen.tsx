@@ -1,9 +1,7 @@
-import * as React from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
+import {View, StyleSheet, Alert, Button} from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import {Data, UndefProps} from "../Navigation/NavTypes";
 import {useEffect} from "react";
-import {Button} from "react-native-elements";
 import {store} from "../Store";
 import {logout} from "./MainScreen";
 import {CommonActions} from "@react-navigation/native";

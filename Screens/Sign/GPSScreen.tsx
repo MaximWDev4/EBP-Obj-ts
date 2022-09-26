@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {Alert} from 'react-native';
 import {SignDataProps, GPS, Data} from "../../Navigation/NavTypes";
 import {useCallback, useEffect, useState} from "react";

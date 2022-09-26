@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {Text, View, StyleSheet, Button} from 'react-native';
 import {TextInput} from 'react-native';
 import {Alert} from 'react-native';
