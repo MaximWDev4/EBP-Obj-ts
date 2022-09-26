@@ -132,11 +132,11 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.ebpreactts"
+        applicationId 'expo.rn.ebp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 140
+        versionName "1.4.0"
     }
     splits {
         abi {

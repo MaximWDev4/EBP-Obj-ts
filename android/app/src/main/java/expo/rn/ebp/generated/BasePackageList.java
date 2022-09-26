@@ -1,4 +1,4 @@
-package com.ebpreactts.generated;
+package expo.rn.ebp.generated;
 
 import java.util.Arrays;
 import java.util.List;

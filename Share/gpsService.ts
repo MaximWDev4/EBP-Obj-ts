@@ -18,11 +18,11 @@ export class GpsService {
     isRunning: Boolean = false;
 
     constructor() {
-        Location.getPermissionsAsync().then( (a) => {
+        Location.getForegroundPermissionsAsync().then( (a) => {
             if (a.android?.scope == 'fine' || a.android?.scope == 'coarse') {
                 this.p = true;
             } else {
-                Location.requestPermissionsAsync().then((e) =>{
+                Location.requestForegroundPermissionsAsync().then((e) =>{
                     this.p = (e.android?.scope == 'fine' || e.android?.scope == 'coarse')
                 })
             }

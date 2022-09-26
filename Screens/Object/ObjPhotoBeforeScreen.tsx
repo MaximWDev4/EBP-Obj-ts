@@ -22,7 +22,7 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
                 }
             });
         }
-        askPermission().then( stat => setHasPermission(stat));
+        askPermission().then(stat => setHasPermission(stat));
     }, [])
 
     const deleteFoto = async (id: number) => {
@@ -50,74 +50,76 @@ export default function ObjPhotoBeforeScreen({route, navigation}: ObjDataProps) 
 
 
     }
-    let IM: ListRenderItem<any> =  (props) => {
-            let image;
-            console.log(props.item)
-            if (props.item !== '' && typeof props.item !== "undefined") {
-                image = (
-                    <Image source={
-                        // require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
-                        {uri: props.item}
-                    } style={{width: 100, height: 100}}/>
-                )
-            }
-            return (
-                <View style={{
-                    marginTop: 10,
-                    flexDirection: 'row',
-                    //flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    flex: 1
-                }}>
-
-                    <View style={{
-                        flex: 3
-                    }}>
-
-                        <Image source={{uri: images[props.index]}} style={{width: 100, height: 100}}/>
-                    </View>
-
-                    <View style={{
-                        paddingTop: 15,
-                        flex: 5
-                    }}>
-                        <Text style={styles.text}>Изображение выбрано </Text>
-
-
-                    </View>
-
-                    <View
-                        style={{
-                            //width: 32,
-                            //justifyContent: 'flex-end',
-                            //padding:30,
-                            paddingBottom: 25,
-                            flex: 1
-                        }}>
-                        <TouchableOpacity onPress={ () => deleteFoto(props.index)}>
-                            <Image style={{
-                                width: 32,
-                                height: 32,
-                            }}
-                                   source={require('../../assets/images/delete.png')}/>
-                        </TouchableOpacity>
-                    </View>
-
-                </View>
+    let IM: ListRenderItem<any> = (props) => {
+        let image;
+        console.log(props.item)
+        if (props.item !== '' && typeof props.item !== "undefined") {
+            image = (
+                <Image source={
+                    // require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
+                    {uri: props.item}
+                } style={{width: 100, height: 100}}/>
             )
         }
+        return (
+            <View style={{
+                marginTop: 10,
+                flexDirection: 'row',
+                //flexDirection: 'column',
+                justifyContent: 'space-between',
+                flex: 1
+            }}>
 
-    return (RenderPhotoView({ im: images, next: next, IM: IM, pickNewImage:  (type) => pickImage(type, hasPermission, (s, result) => {
-                if (s) {
-                    try {
-                        setImages([...images, result]);
-                    } catch (e) {
-                        alert(e)
+                <View style={{
+                    flex: 3
+                }}>
+
+                    <Image source={{uri: images[props.index]}} style={{width: 100, height: 100}}/>
+                </View>
+
+                <View style={{
+                    paddingTop: 15,
+                    flex: 5
+                }}>
+                    <Text style={styles.text}>Изображение выбрано </Text>
+
+
+                </View>
+
+                <View
+                    style={{
+                        //width: 32,
+                        //justifyContent: 'flex-end',
+                        //padding:30,
+                        paddingBottom: 25,
+                        flex: 1
+                    }}>
+                    <TouchableOpacity onPress={() => deleteFoto(props.index)}>
+                        <Image style={{
+                            width: 32,
+                            height: 32,
+                        }}
+                               source={require('../../assets/images/delete.png')}/>
+                    </TouchableOpacity>
+                </View>
+
+            </View>
+        )
+    }
+
+    return (RenderPhotoView({
+                im: images, next: next, IM: IM, pickNewImage: (type) => pickImage(type, hasPermission, (s, result) => {
+                    if (s) {
+                        try {
+                            setImages([...images, result]);
+                        } catch (e) {
+                            alert(e)
+                        }
+                    } else {
+                        console.log(result);
                     }
-                } else {
-                    console.log(result);
-                }
-            }), after: false}
+                }), after: false
+            }
         )
     )
 

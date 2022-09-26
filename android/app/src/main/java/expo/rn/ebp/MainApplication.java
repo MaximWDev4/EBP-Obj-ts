@@ -1,4 +1,7 @@
-package com.ebpreactts;
+package expo.rn.ebp;
+import android.content.res.Configuration;
+import expo.modules.ApplicationLifecycleDispatcher;
+import expo.modules.ReactNativeHostWrapper;
 
 import android.app.Application;
 import android.content.Context;
@@ -14,7 +17,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.ebpreactts.generated.BasePackageList;
+import expo.rn.ebp.generated.BasePackageList;
 
 import org.unimodules.adapters.react.ReactAdapterPackage;
 import org.unimodules.adapters.react.ModuleRegistryAdapter;
@@ -36,7 +39,7 @@ public class MainApplication extends Application implements ReactApplication {
     new BasePackageList().getPackageList()
   );
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+  private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(this, new ReactNativeHost(this) {
     @Override
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
@@ -71,7 +74,7 @@ public class MainApplication extends Application implements ReactApplication {
         return UpdatesController.getInstance().getBundleAssetName();
       }
     }
-  };
+  });
 
   @Override
   public ReactNativeHost getReactNativeHost() {
@@ -88,6 +91,7 @@ public class MainApplication extends Application implements ReactApplication {
     }
 
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    ApplicationLifecycleDispatcher.onApplicationCreate(this);
   }
 
   /**
@@ -105,7 +109,7 @@ public class MainApplication extends Application implements ReactApplication {
          We use reflection here to pick up the class that initializes Flipper,
         since Flipper library is not available in release mode
         */
-        Class<?> aClass = Class.forName("com.ebpreactts.ReactNativeFlipper");
+        Class<?> aClass = Class.forName("expo.rn.ebp.ReactNativeFlipper");
         aClass
             .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
             .invoke(null, context, reactInstanceManager);
@@ -119,5 +123,11 @@ public class MainApplication extends Application implements ReactApplication {
         e.printStackTrace();
       }
     }
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
   }
 }

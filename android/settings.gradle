@@ -1,4 +1,4 @@
-rootProject.name = 'ebpreactts'
+rootProject.name = 'ObjEBP'
 include ':react-native-fetch-blob'
 project(':react-native-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fetch-blob/android')
 include ':react-native-fs'
@@ -13,3 +13,6 @@ apply from: file("../node_modules/@react-native-community/cli-platform-android/n
 applyNativeModulesSettingsGradle(settings)
 
 include ':app'
+
+apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
+useExpoModules()

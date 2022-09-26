@@ -1,15 +1,25 @@
 {
-
   "expo": {
-    "icon": "assets/5cauenne.png",
     "name": "ObjEBP",
-    "slug": "objebp",
-    "version": "1.3.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "slug": "ObjEBP",
+    "version": "1.4.0",
+    "orientation": "portrait",
+    "icon": "assets/5.png",
+    "splash": {
+      "image": "assets/5.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
     "android": {
-      "package": "expo.rn.ebp"
+      "adaptiveIcon": {
+        "foregroundImage": "assets/5.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "versionCode": 140
     }
   }
 }

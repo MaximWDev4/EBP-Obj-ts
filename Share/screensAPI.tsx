@@ -11,7 +11,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {GpsService} from  "./gpsService";
+import {GpsService} from "./gpsService";
 // @ts-ignore
 import Spinner from 'react-native-loading-spinner-overlay';
 import {GPS} from "../Navigation/NavTypes";
@@ -56,8 +56,7 @@ const pickImage = async (type: number, hasPermision: boolean, callback: (s: bool
             } else {
                 callback(false, '')
             }
-        }
-        catch (e) {
+        } catch (e) {
             alert(e)
         }
     } else {
@@ -73,7 +72,8 @@ type PhotoViewProps = {
         next: () => void,
         IM: ListRenderItem<any>,
         pickNewImage: (type: number) => void,
-        after: false,}
+        after: false,
+    }
     | {
     im: string[],
     next: () => void,
@@ -145,8 +145,7 @@ function RenderPhotoView(props: PhotoViewProps) {
                                 //takeFoto()
                                 props.pickNewImage(1)
                             }}
-                        >
-                        </Button>
+                        />
                     </View>
 
                     <View style={{
@@ -165,15 +164,14 @@ function RenderPhotoView(props: PhotoViewProps) {
                                 //ZnakFotoBeforetainZnak()
                                 props.pickNewImage(2)
                             }}
-                        >
-                        </Button>
+                        />
                     </View>
 
                 </View>
                 <View style={{height: '60%'}}>
-                <FlatList
-                    keyExtractor={item => item.toString()} data={ props.im} renderItem={ props.IM}
-                />
+                    <FlatList
+                        keyExtractor={item => item.toString()} data={props.im} renderItem={props.IM}
+                    />
                 </View>
             </View>
             <View style={{
@@ -202,12 +200,11 @@ function RenderPhotoView(props: PhotoViewProps) {
                         title='Продолжить'
                         // style={{ flex: 1,
                         // }}
-                        disabled={! props.im.length}
+                        disabled={!props.im.length}
                         onPress={() => {
                             props.next();
                         }}
-                    >
-                    </Button>
+                    />
                     {props.after && <Button
                         title='Пропустить'
                         // style={{ flex: 1,
@@ -216,8 +213,7 @@ function RenderPhotoView(props: PhotoViewProps) {
                         onPress={() => {
                             props.skip();
                         }}
-                    >
-                    </Button>
+                    />
                     }
                 </View>
 
@@ -248,13 +244,13 @@ function RenderGPSView(loading: boolean,
                        rAccCallback: (rAcc: number) => void,
                        loadingCallback: (loading: boolean) => void,
                        next: () => void
-                      ) {
+) {
     const macc = min?.coords.accuracy;
     const [chAccIsVis, setChAccIsVis] = useState(false);
     const [awaitMenu, setAwaitMenu] = useState(false);
     const [selectRacc, setSelectRacc] = useState(false);
-    let accIc = (a: any) => a || a === 0 ? ( a <= al.high ? colors.green :  a <= al.low ? colors.yellow : colors.red ) : colors.gray;
-    let accMarck = macc || macc === 0 ? ( macc <= al.high ? 'Отлично!!!' :  macc <= al.mid ? "Удовлетворительно" : macc <= al.low ? "Неудовлетворительно!" : "Плохо!") : "---";
+    let accIc = (a: any) => a || a === 0 ? (a <= al.high ? colors.green : a <= al.low ? colors.yellow : colors.red) : colors.gray;
+    let accMarck = macc || macc === 0 ? (macc <= al.high ? 'Отлично!!!' : macc <= al.mid ? "Удовлетворительно" : macc <= al.low ? "Неудовлетворительно!" : "Плохо!") : "---";
     // @ts-ignore
 
     return (
@@ -264,45 +260,72 @@ function RenderGPSView(loading: boolean,
                 message={'Вы уверены, что хотите изменить допустимую точность локации?'}
                 color={colors.red}
                 buttons={[
-                    {title: "Отмена", onPress: () => { setChAccIsVis(false)}, style: {backgroundColor: colors.gray, color: colors.green, fontSize: 18, size:  2}},
-                    {title: "Подтвердить", onPress: () => { setChAccIsVis(false); setSelectRacc(!selectRacc) }, style: {backgroundColor: colors.gray, color: colors.red, fontSize: 18, size:  2}}]
-                    }
+                    {
+                        title: "Отмена", onPress: () => {
+                            setChAccIsVis(false)
+                        }, style: {backgroundColor: colors.gray, color: colors.green, fontSize: 18, size: 2}
+                    },
+                    {
+                        title: "Подтвердить", onPress: () => {
+                            setChAccIsVis(false);
+                            setSelectRacc(!selectRacc)
+                        }, style: {backgroundColor: colors.gray, color: colors.red, fontSize: 18, size: 2}
+                    }]
+                }
             />
             <CustomModalWindow
                 show={awaitMenu}
                 message={'Пожалуйста дождитесь точной локации!\n \n (Не закрывайте телефон и по возможности держитесь открытого пространства)'}
                 color={'#000000'}
                 buttons={[
-                    {title: "Подождать", onPress: () => {setAwaitMenu(false);}, style: {backgroundColor: colors.gray, color: '#FFFFFF', fontSize: 18, size:  2}}]
+                    {
+                        title: "Подождать", onPress: () => {
+                            setAwaitMenu(false);
+                        }, style: {backgroundColor: colors.gray, color: '#FFFFFF', fontSize: 18, size: 2}
+                    }]
                 }
             />
-             <View style={{flex: 1}}>
-                 {selectRacc &&
-                 <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', height: 60}}>
-                     <MyButton onPress={() => rAccCallback(al.high)} title={`<${al.high}м`} style={{size: 4, backgroundColor: colors.green, color: 'white', fontSize: 30,}}/>
-                     <MyButton onPress={() => rAccCallback(al.mid)} title={`${al.high}-${al.low}м`} style={{size: 4, backgroundColor: colors.yellow, color: 'white', fontSize: 30,}}/>
-                     <MyButton onPress={() => rAccCallback(al.low+0.1)} title={`>${al.low}м`} style={{size: 4, backgroundColor: colors.red, color: 'white', fontSize: 30,}}/>
-                 </View>
-                 ||
-                 <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: 60, backgroundColor: accIc(macc)}} >
-                     {    // @ts-ignore
-                         macc <= al.high && <Text style={styles.GPSText}>
-                         Погрешность {macc?.toFixed(4)}м
-                     </Text>
-                     ||
-                     <Text style={styles.GPSText}>
-                         Уточнение локации
-                     </Text>}
-                 </View>}
-                <View style={{backgroundColor: colors.transparent, alignItems: 'flex-start', padding: 5, marginBottom: 10}}>
-                    <Text style={[styles.GPSText, {color: accIc(+acc), fontWeight: 'bold' }]}>
-                       {acc}м
+            <View style={{flex: 1}}>
+                {selectRacc &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', height: 80}}>
+                    <MyButton onPress={() => rAccCallback(al.high)} title={`<${al.high}м`}
+                              style={{size: 4, backgroundColor: colors.green, color: 'white', fontSize: 30,}}/>
+                    <MyButton onPress={() => rAccCallback(al.mid)} title={`${al.high}-${al.low}м`}
+                              style={{size: 4, backgroundColor: colors.yellow, color: 'white', fontSize: 30,}}/>
+                    <MyButton onPress={() => rAccCallback(al.low + 0.1)} title={`>${al.low}м`}
+                              style={{size: 4, backgroundColor: colors.red, color: 'white', fontSize: 30,}}/>
+                </View>
+                ||
+                <View style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 60,
+                    backgroundColor: accIc(macc)
+                }}>
+                    {    // @ts-ignore
+                        macc <= al.high && <Text style={styles.GPSText}>
+                            Погрешность {macc?.toFixed(4)}м
+                        </Text>
+                        ||
+                        <Text style={styles.GPSText}>
+                            Уточнение локации
+                        </Text>}
+                </View>}
+                <View style={{
+                    backgroundColor: colors.transparent,
+                    alignItems: 'flex-start',
+                    padding: 5,
+                    marginBottom: 10
+                }}>
+                    <Text style={[styles.GPSText, {color: accIc(+acc), fontWeight: 'bold'}]}>
+                        {acc}м
                     </Text>
-                    <Text style={[styles.GPSText, {color: accIc(macc), fontWeight: 'bold' }]}>
+                    <Text style={[styles.GPSText, {color: accIc(macc), fontWeight: 'bold'}]}>
                         ~{min?.coords.accuracy?.toFixed(2)}м
                     </Text>
                 </View>
-                <TextStroke stroke={ 0.5 } color={ '#FFFFFF' }>
+                <TextStroke stroke={0.5} color={'#FFFFFF'}>
                     <Text onPress={() => setChAccIsVis(true)} style={{
                         textAlign: "center",
                         height: 55,
@@ -310,8 +333,9 @@ function RenderGPSView(loading: boolean,
                         textAlignVertical: 'bottom',
                         fontSize: 22,
                         backgroundColor: '#9d9999',
-                        color: accIc(rAcc)}}>
-                        Целевая точность: {rAcc<4.6?rAcc:'>4.5'}м.
+                        color: accIc(rAcc)
+                    }}>
+                        Целевая точность: {rAcc < 4.6 ? rAcc : '>4.5'}м.
                     </Text>
                 </TextStroke>
                 <View style={{paddingTop: 10, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -322,25 +346,27 @@ function RenderGPSView(loading: boolean,
 
                 </View>
                 <View style={{flex: 1}}>
-                <View style={{flex: 1,}}>
-                    <MyButton style={{height: 50, backgroundColor: colors.gray, fontSize: 22}} title='Продолжить' onPress={() => {
-                        if (macc || macc === 0){
-                            if (macc < rAcc || macc <= al.mid || (rAcc >= al.mid && macc <= al.low) || rAcc > al.low) {
-                                next();
-                            } else {
-                                setAwaitMenu(true);
-                            }
-                        } else {
-                            setAwaitMenu(true);
-                        }
-                    }}/>
-                </View>
+                    <View style={{flex: 1,}}>
+                        <MyButton style={{height: 50, backgroundColor: colors.gray, fontSize: 22}} title='Продолжить'
+                                  onPress={() => {
+                                      if (macc || macc === 0) {
+                                          if (macc < rAcc || macc <= al.mid || (rAcc >= al.mid && macc <= al.low) || rAcc > al.low) {
+                                              next();
+                                          } else {
+                                              setAwaitMenu(true);
+                                          }
+                                      } else {
+                                          setAwaitMenu(true);
+                                      }
+                                  }}/>
+                    </View>
                 </View>
             </View>
 
         </View>
     );
 }
+
 export default pickImage;
 
 export {pickImage, RenderPhotoView, RenderGPSView}

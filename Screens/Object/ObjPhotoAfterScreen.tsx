@@ -8,7 +8,7 @@ import * as FileSystem from "expo-file-system";
 import {askPermission} from "../../Share/func";
 
 export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
-    const Data : Data = route.params;
+    const Data: Data = route.params;
     const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [images, setImages] = useState<string[]>([]);
 
@@ -24,11 +24,10 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
             }, (e) => {
                 console.log(e)
             });
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e)
         }
-        askPermission().then( (stat: any) => setHasPermission(stat));
+        askPermission().then((stat: any) => setHasPermission(stat));
     }, [])
 
     const deleteFoto = async (id: number) => {
@@ -96,7 +95,7 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
                         paddingBottom: 25,
                         flex: 1
                     }}>
-                    <TouchableOpacity onPress={ () => deleteFoto(props.index)}>
+                    <TouchableOpacity onPress={() => deleteFoto(props.index)}>
                         <Image style={{
                             width: 32,
                             height: 32,
@@ -109,19 +108,22 @@ export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
         )
     }
 
-    return (RenderPhotoView({ im: images, next: next, IM: IM, pickNewImage:  (type) => pickImage(type, hasPermission, (s, result) => {
-                if (s) {
-                    try {
-                        setImages([...images, result]);
-                    } catch (e) {
-                        alert(e)
+    return (RenderPhotoView({
+                im: images, next: next, IM: IM, pickNewImage: (type) => pickImage(type, hasPermission, (s, result) => {
+                    if (s) {
+                        try {
+                            setImages([...images, result]);
+                        } catch (e) {
+                            alert(e)
+                        }
+                    } else {
+                        console.log(result);
                     }
-                } else {
-                    console.log(result);
+                }), after: true, skip: () => {
+                    // setImages([Asset.fromModule(require('../../assets/images/maintaining.png')).uri]);
+                    next()
                 }
-            }), after: true, skip: () => {
-                // setImages([Asset.fromModule(require('../../assets/images/maintaining.png')).uri]);
-                next()}}
+            }
         )
     )
 

@@ -1,22 +1,22 @@
-import { RouteProp } from '@react-navigation/native';
+import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from "@react-navigation/stack";
 
 export type GPS = {
-        "coords": {
-            "accuracy": number | null,
-            "altitude": number | null,
-            "heading": number | null,
-            "latitude": number | null,
-            "longitude": number | null,
-            "speed"?: number | null,
-        },
-        "mocked"?: boolean,
-        "timestamp"?: number,
+    "coords": {
+        "accuracy": number | null,
+        "altitude": number | null,
+        "heading": number | null,
+        "latitude": number | null,
+        "longitude": number | null,
+        "speed"?: number | null,
+    },
+    "mocked"?: boolean,
+    "timestamp"?: number,
 }
 
 export type Data = {
     "gps"?: GPS,
-    "imageAfter"?:string[],
+    "imageAfter"?: string[],
     "imageBefore"?: string[],
     "qrcode"?: string,
     "sid"?: number;
@@ -24,8 +24,8 @@ export type Data = {
 }
 
 export type StackParams = {
-    SignStack: {imageBefore: any[]};
-    ObjStack: {imageBefore: any[]};
+    SignStack: { imageBefore: any[] };
+    ObjStack: { imageBefore: any[] };
     Root: undefined;
 }
 
@@ -35,20 +35,20 @@ export type RootStackParamList = {
     Welcome: undefined;
     Main: undefined;
     // Revision: undefined;
-    Upload:  undefined ;
+    Upload: undefined;
 };
 
 export type SignStackParamList = {
     SignPhotoBefore: Data;
     SignPhotoAfter: Data;
-    QR: Data ;
-    GPS:Data;
-    Znak:Data;
+    QR: Data;
+    GPS: Data;
+    Znak: Data;
 }
 
-export type ObjStackParamList ={
+export type ObjStackParamList = {
     ObjPhotoBefore: Data
-    ObjGPS:Data;
+    ObjGPS: Data;
     ObjPhotoAfter: Data
     ObjUpload: Data;
 }
@@ -106,13 +106,13 @@ export type StackDataProps = {
 }
 
 export type SignDataProps = {
-    route:  GPSScreenRouteProp
+    route: GPSScreenRouteProp
         | SignPhotoBeforeScreenRouteProp
         | QRScreenRouteProp
         | SignPhotoAfterScreenRouteProp
         | ZnakScreenRouteProp;
 
-    navigation:  GPSScreenNavigationProp
+    navigation: GPSScreenNavigationProp
         | SignPhotoBeforeScreenNavigationProp
         | QRScreenNavigationProp
         | SignPhotoAfterScreenNavigationProp
@@ -121,9 +121,9 @@ export type SignDataProps = {
 
 export type ObjDataProps = {
     route:
-         ObjPhotoBeforeScreenRouteProp
-        |ObjPhotoAfterScreenRouteProp
-        |ObjGPSScreenRouteProp;
+        ObjPhotoBeforeScreenRouteProp
+        | ObjPhotoAfterScreenRouteProp
+        | ObjGPSScreenRouteProp;
 
     navigation:
         | ObjPhotoAfterScreenNavigationProp
@@ -148,6 +148,6 @@ export type UndefProps = {
         | WelcomeScreenNavigationProp
         // | SignStackNavigationProp
         | UploadScreenNavigationProp
-        // | ObjStackNavigationProp
+    // | ObjStackNavigationProp
 }
 

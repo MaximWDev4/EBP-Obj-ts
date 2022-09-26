@@ -1,260 +1,163 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
-import { TextInput } from 'react-native';
-import { Alert } from 'react-native';
+import {Text, View, StyleSheet, Button} from 'react-native';
+import {TextInput} from 'react-native';
+import {Alert} from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import {Data, UndefProps} from '../Navigation/NavTypes'
-import { getUrl } from '../Share/func';
+import {getUrl} from '../Share/func';
 import {useState} from "react";
 import {store} from "../Store";
+import {HelperInit} from "../Share/helperInit";
 
 
-export function LoginScreen ({route, navigation}: UndefProps) {
-	let Token: any = '';
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
+export function LoginScreen({route, navigation}: UndefProps) {
+    const helper: HelperInit = new HelperInit();
+    let Token: any = '';
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
 
-	const onChangeText1 = (text: string) => {
-		setUsername(text);
-	}
+    const onChangeText1 = (text: string) => {
+        setUsername(text);
+    }
 
-	const onChangeText2 = (text: string) => {
-		setPassword(text);
-	}
-	const getToken = () => {
+    const onChangeText2 = (text: string) => {
+        setPassword(text);
+    }
+    const getToken = () => {
 
-		if (!username || !password) {
-			alert('Empty Username or Password');
-			return;
-		}
+        if (!username || !password) {
+            alert('Empty Username or Password');
+            return;
+        }
+        try {
+            helper.authenticate(password, username).then(async (responseJson) => {
+                try {
+                    console.log(responseJson);
+                    if (responseJson.code == 2) {
+                        Alert.alert('Неверный логин или пароль ', responseJson.msg);
+                        return false
+                    }
+                    console.log(responseJson);
+                    //if ( responseJson.code == 0 ) {
+                    if (typeof responseJson.token !== 'undefined' && responseJson.token !== null) {
+                        //const id = responseJson.id;
+                        //const Token = responseJson.token;
+                        Token = responseJson.token;
+                        const fileUri = FileSystem.documentDirectory + 'Token';
 
-		const url = getUrl('auth');
-		let body = 'USERNAME=' + username + '&' + 'PASSWORD=' + password;
+                        //const p1 = FileSystem.getInfoAsync(fileUri);
+                        await FileSystem.writeAsStringAsync(fileUri, Token).catch((e) => {
+                            console.log(e)
+                        });
+                        return true
+                    } else {
+                        //Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
+                        //Alert.alert('Error', responseJson.code + ': ' + responseJson.msg );
+                        Alert.alert('ResponsecodeError ' + responseJson.code + ': ', responseJson.msg);
+                        return false
+                    }
+                } catch (e) {
+                    console.log(e)
+                    Alert.alert('TokenSaveError')
+                    return false
+                }
+            }).then(async (success) => {
+                if (success) {
+                    await helper.getRoles(Token).catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getRoles', err)
+                    });
+                    await helper.getGosts().catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getGosts', err)
+                    });
+                    await helper.getKrepl().catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getKrepl', err)
+                    });
+                    await helper.getVidr().catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getVidr', err)
+                    });
+                    await helper.getObjTypes().catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getObjTypes', err)
+                    });
+                    await helper.getTiporaz().catch((e: any[]) => {
+                        let err = e.toString();
+                        console.log(e.toString())
+                        Alert.alert('getTiporaz', err)
+                    });
+                }
+                return success
+            })
+                .then((success) => {
+                    if (Token && success) {
+                        store.dispatch({type: 'system/set-token', payload: Token})
+                        navigation.replace('Welcome')
+                    }
+                }).catch((e: any[]) => {
+                let err = e.toString();
+                console.log(e.toString())
+                Alert.alert('UnnownErr', err)
+            });
+        } catch (e) {
+            alert('Ошибка');
+        }
+    }
+    return (
+        <View style={{flexDirection: 'column', flex: 1}}>
+            <View style={{flex: 1}}/>
 
-		try {
-			return fetch(url, {
+            <View style={{padding: 5, flex: 1}}>
+                <Text style={styles.text}>
+                    Login
+                </Text>
 
-				//return await fetch(url, {
-				method: 'post',
-				//method: 'get',
-				headers: {
-					"Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-					'Accept': 'application/json'
-				},
-				body: body,
-			})
-				.then(response => {
-					if (response.ok) {
-						return response.json()
-					} else if (response.status === 404) {
-						return Promise.reject('error 404: ' + response.statusText).then((success) => {
-						}, (error) => Alert.alert('Error 404', 'Не найден путь'));
-					} else {
-						return Promise.reject('some other error: ' + response.status).then((success) => {
-						}, (error) => Alert.alert('Error', 'Неожиданная ошибка сети'));
-					}
-				})
-				//.then(async(responseJson) => {
-				.then((responseJson) => {
-					//if ( responseJson.code == 0 ) {
-					if (typeof responseJson.token !== 'undefined' || responseJson.token !== null) {
-						//const id = responseJson.id;
-						//const Token = responseJson.token;
-						Token = responseJson.token;
-
-						const fileUri = FileSystem.documentDirectory + 'Token';
-
-						//const p1 = FileSystem.getInfoAsync(fileUri);
-						return FileSystem.writeAsStringAsync(fileUri, Token);
-
-					} else {
-						//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
-						//Alert.alert('Error', responseJson.code + ': ' + responseJson.msg );
-						Alert.alert('Error ' + responseJson.code.toString() + ': ', responseJson.msg.toString());
-					}
-
-				})
-
-				.then(async (responseJson) => {
-					const url = getUrl('objtype');
-
-					//return fetch(url) .then((response) => {
-					return await fetch(url).then((response) => {
-						return response.json()
-					}).then((responseJson) => {
-
-						let data: any[] = [];
-
-						for (var i = 0; i < responseJson.length; i++) {
-							let obj = responseJson[i];
-
-							data.push({
-								id: obj.id,
-								name: obj.name,
-							})
-						}
-
-						const fileUri = FileSystem.documentDirectory + 'objtype';
-						return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
-					})
-
-				}).then(async (responseJson) => {
-					const url = getUrl('vidr');
-					return await fetch(url).then((response) => {
-						return response.json()
-					}).then((responseJson) => {
-
-						let data: any[] = [];
-
-						for (var i = 0; i < responseJson.length; i++) {
-							let obj = responseJson[i];
-
-							data.push({
-								id: obj.id,
-								name: obj.name,
-							})
-						}
-
-						const fileUri = FileSystem.documentDirectory + 'vidr';
-						return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
-					})
-
-				})
-				.then(async (responseJson) => {
-					const url = getUrl('gost');
-
-					//return fetch(url) .then((response) => {
-					return await fetch(url).then((response) => {
-						return response.json()
-					})
-						.then((responseJson) => {
-
-							let data: any[] = [];
-
-							for (var i = 0; i < responseJson.length; i++) {
-								let obj = responseJson[i];
-
-								if (!Array.isArray(data[obj.type])) {
-									data[obj.type] = [];
-								}
-
-								data[obj.type].push({
-									id: obj.id,
-									name: obj.name,
-									number: obj.number,
-								})
-							}
-
-							const fileUri = FileSystem.documentDirectory + 'gost';
-							return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
-						})
-
-				})
-				.then(async (responseJson) => {
-					const url = getUrl('krepl');
-
-					return await fetch(url).then((response) => {
-						return response.json()
-					}).then((responseJson) => {
-
-						const fileUri = FileSystem.documentDirectory + 'krepl';
-						return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
-					})
-
-				})
-				.then(async (responseJson) => {
-					const url = getUrl('tiporaz');
-
-					return await fetch(url).then((response) => {
-						return response.json()
-					}).then((responseJson) => {
-
-						const fileUri = FileSystem.documentDirectory + 'tiporaz';
-						return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
-					})
-
-				})
-				.then(async (responseJson) => {
-					const url = getUrl('roles');
-
-					let body = 'Token=' + Token;
-
-					return fetch(url, {
-						method: 'post',
-						headers: {
-							"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-						},
-						body: body,
-					})
-						.then((response) => {
-							return response.json()
-						}).then((responseJson) => {
-							console.log(JSON.stringify(responseJson))
-							const fileUri = FileSystem.documentDirectory + 'roles';
-							return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
-						})
-
-				})
-				.then((responseJson) => {
-					store.dispatch({type: 'system/set-token', payload: Token})
-					navigation.replace('Welcome')
-					//this.props.navigation.navigate('Znak', { Data: this.Token })
-
-				}).catch((error) => Alert.alert('Неверный логин или пароль'));
-		} catch (e) {
-			alert('Ошибка');
-		}
-	}
-	return (
-			<View style={{ flexDirection: 'column', flex: 1 }}>
-				<View style={{ flex: 1 }} />
-
-				<View style={{ padding: 5, flex: 1}}>
-					<Text style={styles.text}>
-						Login
-					</Text>
-
-					<TextInput style={styles.input} onChangeText={text => onChangeText1(text)}
-						//onChangeText={text => onChangeText(text)}
-						//value={value}
-						value={username}
-					/>
+                <TextInput style={styles.input} onChangeText={text => onChangeText1(text)}
+                    //onChangeText={text => onChangeText(text)}
+                    //value={value}
+                           value={username}
+                />
 
 
-					<Text style={styles.text}>
-						Password
-					</Text>
+                <Text style={styles.text}>
+                    Password
+                </Text>
 
-					<TextInput style={styles.input} onChangeText={text => onChangeText2(text)}
-						//onChangeText={text => onChangeText(text)}
-						//value={value}
-						value={password}
-					/>
+                <TextInput style={styles.input} onChangeText={text => onChangeText2(text)}
+                    //onChangeText={text => onChangeText(text)}
+                    //value={value}
+                           value={password}
+                />
 
-				</View>
+            </View>
 
-				<View style={{ flex: 1, flexDirection: 'column-reverse', padding: 5, }} >
-					<Button title='Войти' onPress={() => {
-						getToken();
-					}}
-						//this.props.navigation.navigate('Welcome', { Data })
-						//this.props.navigation.navigate('Welcome', {
-						//Data: {
-						//Token: 'a6065650fb9b5df5f8bdaa796ab50c84',
-						//}
-						//})
-						//this.props.navigation.navigate('Welcome', {
-						//routes: this.state.routes,
-						////parking: this.state.parking, car: this.state.carname, carsjson: this.state.dataSource
-						//})
-						//this.fetchData(2)
-					>
-						Text
-					</Button>
-				</View>
+            <View style={{flex: 1, flexDirection: 'column-reverse', padding: 5,}}>
+                <Button title='Войти' onPress={() => {
+                    getToken();
+                }}
+                    //this.props.navigation.navigate('Welcome', { Data })
+                    //this.props.navigation.navigate('Welcome', {
+                    //Data: {
+                    //Token: 'a6065650fb9b5df5f8bdaa796ab50c84',
+                    //}
+                    //})
+                    //this.props.navigation.navigate('Welcome', {
+                    //routes: this.state.routes,
+                    ////parking: this.state.parking, car: this.state.carname, carsjson: this.state.dataSource
+                    //})
+                    //this.fetchData(2)
+                />
+            </View>
 
-			</View>
-		);
+        </View>
+    );
 }
 
 
@@ -266,12 +169,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     //picker: {
-        //width: Dimensions.get('window').width - 30
+    //width: Dimensions.get('window').width - 30
     //},
     //datepicker: {
-        //width: Dimensions.get('window').width - 30,
-        //margin: 10,
-        //marginBottom: 20
+    //width: Dimensions.get('window').width - 30,
+    //margin: 10,
+    //marginBottom: 20
     //},
     item: {
         flex: 1,
@@ -284,19 +187,16 @@ const styles = StyleSheet.create({
     },
 
 
-
     text: {
-		height: 40,
-		textAlignVertical: 'bottom',
+        height: 40,
+        textAlignVertical: 'bottom',
     },
-	input: {
-		height: 40,
-		backgroundColor: '#eee',
-		borderColor: 'gray',
-		borderWidth: 1
-	},
-
-
+    input: {
+        height: 40,
+        backgroundColor: '#eee',
+        borderColor: 'gray',
+        borderWidth: 1
+    },
 
 
     button: {

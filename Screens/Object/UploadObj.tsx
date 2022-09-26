@@ -30,7 +30,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 	const Network = async (): Promise<boolean> => {
 		let check: boolean = false;
 		await NetInfo.fetch().then(state => {
-			check = state.isConnected;
+			check = state.isConnected??false;
 		});
 		return check;
 	}

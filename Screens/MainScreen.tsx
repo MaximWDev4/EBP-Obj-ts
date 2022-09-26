@@ -4,7 +4,7 @@ import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
 import DB from '../Share/storage'
-import {UndefProps, Data} from "../Navigation/NavTypes";
+import {UndefProps} from "../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {CommonActions} from "@react-navigation/native";
 import {store} from "../Store";
@@ -84,7 +84,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 					style: 'cancel',
 				},
 				{text: 'Да', onPress: () => {
-						navigation.dangerouslyGetParent()?.navigate('SignStack', {
+						navigation.getParent()?.navigate('SignStack', {
 							params: {imageBefore: []},
 						})
 					}},
@@ -100,7 +100,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 				style: 'cancel',
 			},
 			{text: 'Да', onPress: () => {
-					navigation.dangerouslyGetParent()?.navigate('ObjStack', {
+					navigation.getParent()?.navigate('ObjStack', {
 							    params: {imageBefore: []},
 				})
 			}}]
@@ -138,8 +138,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 							// }
 							maintainSign();
 						}}
-					>
-					</Button>
+					/>
 				</View>
 
 			);
@@ -163,8 +162,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 							// }
 							maintainObj()
 						}}
-					>
-					</Button>
+					/>
 				</View>
 
 			);
@@ -249,8 +247,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 						onPress={() => {
 							uploadSign()
 						}}
-					>
-					</Button>
+					/>
 				</View>
 
 				{/*
@@ -287,8 +284,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 					//onPress={() => {
 					//fetchData(2)
 					//}}
-				>
-				</Button>
+				/>
 			</View>
 			<View style={{
 				flex: 0.33,
@@ -310,8 +306,7 @@ export default function MainScreen({ route, navigation }: UndefProps) {
 					//onPress={() => {
 					//fetchData(2)
 					//}}
-				>
-				</Button>
+				/>
 			</View>
 
 		</View>

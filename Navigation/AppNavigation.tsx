@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {createStackNavigator} from "@react-navigation/stack";
 import {LoginScreen} from "../Screens/LoginScreen";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Svg, {Path} from 'react-native-svg'
 import {
     ObjDataProps,
@@ -28,7 +28,6 @@ import {Home} from "../Share/components";
 import {CommonActions, NavigationContainer} from "@react-navigation/native";
 
 
-
 const RootStack = createStackNavigator<RootStackParamList>();
 const SignStack = createStackNavigator<SignStackParamList>();
 const ObjStack = createStackNavigator<ObjStackParamList>();
@@ -46,6 +45,7 @@ const returnHome = (navigation: any) => {
         })
     )
 }
+
 export function StackNavigator() {
     function SignNavigation({navigation, route}: SignDataProps) {
         return (
@@ -124,8 +124,9 @@ export function StackNavigator() {
             </RootStack.Navigator>
         );
     }
+
     return (
-        <Stack.Navigator initialRouteName={"Root"} >
+        <Stack.Navigator initialRouteName={"Root"}>
             <Stack.Screen
                 name={"Root"}
                 component={AppNavigation}
