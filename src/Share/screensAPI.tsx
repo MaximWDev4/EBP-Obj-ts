@@ -11,7 +11,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {GpsService} from "./gpsService";
 // @ts-ignore
 import Spinner from 'react-native-loading-spinner-overlay';
 import {GPS} from "../Navigation/NavTypes";
@@ -50,8 +49,8 @@ const pickImage = async (type: number, hasPermision: boolean, callback: (s: bool
                     quality: 1
                 })
             }
-            if (!result?.cancelled) {
-                callback(true, result?.uri);
+            if (!result?.canceled) {
+                callback(true, result?.assets[0].uri);
             } else {
                 callback(false, '')
             }
@@ -113,8 +112,8 @@ function RenderPhotoView(props: PhotoViewProps) {
 
                     <Text style={styles.header}>
 
-                        Сделать фото до:
-
+                        { !props.after ? 'Сделать фото до:' : 'Сделать фото после:' }
+                    {/* todo */}
                     </Text>
 
                 </View>
@@ -286,7 +285,7 @@ function RenderGPSView(loading: boolean,
             />
             <View style={{flex: 1}}>
                 {selectRacc &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', height: 80}}>
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', maxWidth: '100%', height: 'auto'}}>
                     <MyButton onPress={() => rAccCallback(al.high)} title={`<${al.high}м`}
                               style={{size: 4, backgroundColor: colors.green, color: 'white', fontSize: 30,}}/>
                     <MyButton onPress={() => rAccCallback(al.mid)} title={`${al.high}-${al.low}м`}
@@ -299,7 +298,7 @@ function RenderGPSView(loading: boolean,
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    height: 60,
+                    height: 'auto',
                     backgroundColor: accIc(macc)
                 }}>
                     {    // @ts-ignore
@@ -404,10 +403,9 @@ const styles = StyleSheet.create({
     },
 
     GPSText: {
-        marginTop: -10,
         textAlign: "center",
         color: 'white',
-        height: 40,
+        padding: 10,
         textAlignVertical: 'bottom',
         fontSize: 30,
     },

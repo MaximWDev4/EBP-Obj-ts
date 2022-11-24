@@ -1,43 +1,52 @@
-import {StyleSheet, GestureResponderEvent, ListRenderItem, Image, View, Text, TouchableOpacity} from 'react-native';
-import {Data, SignDataProps} from "../../Navigation/NavTypes";
+import {Image, ListRenderItem, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Data, ObjDataProps} from "../../Navigation/NavTypes";
 import {useEffect, useState} from "react";
 import {pickImage, RenderPhotoView} from "../../Share/screensAPI";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import {askPermission} from "../../Share/func";
 
-export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) {
-
-    const Data = route.params;
-    const [hasPermission, setHasPermission] = useState(false);
+export default function ObjPhotoAfterScreen({route, navigation}: ObjDataProps) {
+    const Data: Data = route.params;
+    const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [images, setImages] = useState<string[]>([]);
 
     useEffect(() => {
-        ImagePicker.getPendingResultAsync().then((pend_img) => {
-            if (pend_img && pend_img[0].hasOwnProperty('uri')) {
-                // @ts-ignore
-                setImages([pend_img[0].uri]);
-            }
-        });
-        askPermission().then(stat => setHasPermission(stat));
+        try {
+            ImagePicker.getPendingResultAsync().then((pend_img) => {
+                if (typeof pend_img !== 'undefined') {
+                    if (pend_img[0].hasOwnProperty('uri')) {
+                        // @ts-ignore
+                        setImages(pend_img[0].uri);
+                    }
+                }
+            }, (e) => {
+                console.log(e)
+            });
+        } catch (e) {
+            console.log(e)
+        }
+        askPermission().then((stat: any) => setHasPermission(stat));
     }, [])
 
-
-    const deleteFoto = async () => {
+    const deleteFoto = async (id: number) => {
+        let tempArr: string[];
         try {
-            let fileExists = (await FileSystem.getInfoAsync(images[0])).exists;
+            let fileExists = (await FileSystem.getInfoAsync(images[id])).exists;
             if (fileExists) {
-                await FileSystem.deleteAsync(images[0]);
+                await FileSystem.deleteAsync(images[id]);
             }
         } finally {
-            setImages([]);
+            tempArr = [...images]
+            tempArr.splice(id, 1)
+            setImages(tempArr);
         }
     }
 
     const next = () => {
         let data: Data = Data;
         data.imageAfter = images;
-        navigation.navigate('Znak', data);
+        navigation.navigate('ObjUpload', data);
     }
 
 
@@ -48,7 +57,7 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
             image = (
                 <Image source={
                     // require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
-                    {uri: images[props.index]}
+                    {uri: props.item}
                 } style={{width: 100, height: 100}}/>
             )
         }
@@ -72,7 +81,7 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
                     paddingTop: 15,
                     flex: 5
                 }}>
-                    <Text style={{fontSize: 20, height: 40, textAlignVertical: 'bottom'}}>Изображение выбрано </Text>
+                    <Text style={styles.text}>Изображение выбрано </Text>
 
 
                 </View>
@@ -85,12 +94,12 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
                         paddingBottom: 25,
                         flex: 1
                     }}>
-                    <TouchableOpacity onPress={() => deleteFoto()}>
+                    <TouchableOpacity onPress={() => deleteFoto(props.index)}>
                         <Image style={{
                             width: 32,
                             height: 32,
                         }}
-                               source={require('../../assets/images/delete.png')}/>
+                               source={require('../../../assets/images/delete.png')}/>
                     </TouchableOpacity>
                 </View>
 
@@ -119,3 +128,56 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
 
 }
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    item: {
+        flex: 1,
+        alignSelf: 'stretch',
+        margin: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee'
+    },
+
+    spinnerTextStyle: {
+        color: '#FFF'
+    },
+
+    text: {
+        fontSize: 20,
+        height: 40,
+        textAlignVertical: 'bottom',
+    },
+    input: {
+        height: 40,
+        backgroundColor: '#eee',
+        borderColor: 'gray',
+        borderWidth: 1
+    },
+
+    GPSText: {
+        marginTop: -10,
+        textAlign: "center",
+        color: 'white',
+        height: 40,
+        textAlignVertical: 'bottom',
+        fontSize: 30,
+    },
+
+    header: {
+        height: 40,
+        textAlignVertical: 'bottom',
+        textDecorationLine: 'underline',
+        fontSize: 22,
+    },
+
+    button: {
+        margin: 5
+    }
+});

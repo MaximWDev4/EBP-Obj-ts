@@ -89,7 +89,7 @@ export function UploadScreen({route, navigation}: UndefProps) {
             let id = null;
             const sent = await sendZnakObj(body, record.type == 'znak' ? 'save' : 'saveobj');
 
-            if (sent === false) {
+            if (sent === null) {
                 callback();
             } else {
                 let id = sent;
@@ -169,7 +169,7 @@ export function UploadScreen({route, navigation}: UndefProps) {
             await send(record, async (cid: any) => {
                 record.sid = cid;
                 await SendInfo(record, finish)
-            });
+            }).catch((e) => { finish(false)});
         }
     }
 
@@ -209,7 +209,7 @@ export function UploadScreen({route, navigation}: UndefProps) {
             image = (
                 <Image source={
                     // require('file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540maxdev4%252Febp-react-ts/Image_1.png')
-                    require('../assets/images/robot-dev.png')
+                    require('../../assets/images/robot-dev.png')
                 } style={{width: 100, height: 100}}/>
             )
         }
@@ -284,7 +284,7 @@ export function UploadScreen({route, navigation}: UndefProps) {
                                 width: 32,
                                 height: 32,
                             }}
-                                   source={require('../assets/images/delete.png')}/>
+                                   source={require('../../assets/images/delete.png')}/>
                         </TouchableOpacity>
                     </View>
 
@@ -393,7 +393,7 @@ export function UploadScreen({route, navigation}: UndefProps) {
                 }}>
 
                     <Button
-                        title='Отменить'
+                        title='Назад'
                         onPress={() => {
                             navigation.replace('Main')
                         }}

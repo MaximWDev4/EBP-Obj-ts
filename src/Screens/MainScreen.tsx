@@ -9,12 +9,13 @@ import {CommonActions} from "@react-navigation/native";
 import {store} from "../Store";
 
 export const logout = async(navigation: any) => {
-
-	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'Token');
-	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'roles');
-	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'gost');
-	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'tiporaz');
-	await FileSystem.deleteAsync(FileSystem.documentDirectory + 'krepl');
+	if ((await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'Token')).exists) {
+		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'Token');
+		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'roles');
+		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'gost');
+		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'tiporaz');
+		await FileSystem.deleteAsync(FileSystem.documentDirectory + 'krepl');
+	}
 	store.dispatch({type: 'system/clear-token', payload: ''})
 	navigation.dispatch(
 		CommonActions.reset({

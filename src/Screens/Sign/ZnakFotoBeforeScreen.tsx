@@ -80,7 +80,7 @@ export default function ZnakFotoBeforeScreen({navigation, route}: SignDataProps)
                             width: 32,
                             height: 32,
                         }}
-                               source={require('../../assets/images/delete.png')}/>
+                               source={require('../../../assets/images/delete.png')}/>
                     </TouchableOpacity>
                 </View>
 

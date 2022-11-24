@@ -6,10 +6,9 @@ import * as FileSystem from 'expo-file-system';
 import {ModalActivityIndicator} from "./Share/components";
 import {store} from "./Store";
 import {GpsService} from './Share/gpsService'
-import {GestureHandlerRootView} from "react-native-gesture-handler";
+import {Provider} from "react-redux";
 const PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const fileName = FileSystem.documentDirectory + PERSISTENCE_KEY
-const fileUri = FileSystem.documentDirectory + 'Token';
 
 export default function App() {
   const gpsService = new GpsService();
@@ -77,10 +76,10 @@ export default function App() {
       }
   }, [isReady]);
   if (!isReady) {
-    return <GestureHandlerRootView style={{ flex: 1 }}><ModalActivityIndicator show={!isReady}/></GestureHandlerRootView>
+    return <ModalActivityIndicator show={!isReady}/>
   }
   return (
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
         <NavigationContainer
             initialState={initialState}
             onStateChange={(state) => {
@@ -92,7 +91,7 @@ export default function App() {
         >
           {StackNavigator()}
         </NavigationContainer>
-      </GestureHandlerRootView>
+      </Provider>
   );
 }
 // export default function App() {

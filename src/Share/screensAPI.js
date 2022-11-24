@@ -128,7 +128,7 @@ function IM(image, callback) {
     <react_native_1.Image style={{
         width: 32,
         height: 32,
-    }} source={require('../assets/images/delete.png')}/>
+    }} source={require('../../assets/images/delete.png')}/>
     </react_native_1.TouchableOpacity>
     </react_native_1.View>
 
@@ -222,7 +222,7 @@ function RenderPhotoView(im, next, pickNewImage) {
         flex: 1,
     }}>
 
-                    <react_native_1.Button title='Продолжить' 
+                    <react_native_1.Button title='Продолжить'
     // style={{ flex: 1,
     // }}
     disabled={!im} onPress={function () {
@@ -314,17 +314,17 @@ function RenderGPSView(loading, acc, rAcc, min, minCallback, rAccCallback, loadi
 
                 </react_native_1.View>
                 <react_native_1.View style={{ flex: 1 }}>
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+
+
+
+
+
+
+
+
+
+
+
                 <react_native_1.View style={{ flex: 1, }}>
                     <components_1.MyButton style={{ height: 50, backgroundColor: colors.gray, fontSize: 22 }} title='Продолжить' onPress={function () {
         if (macc || macc === 0) {

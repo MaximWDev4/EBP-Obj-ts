@@ -57,43 +57,39 @@ export class HelperInit {
         }
     }
 
-    async getObjTypes() {
+    getObjTypes() {
         try {
-            return async () => {
-                const url = getUrl('objtype');
+           const url = getUrl('objtype');
 
-                //return fetch(url) .then((response) => {
-                return await fetch(url).then((response) => {
-                    return response.json()
-                }).then((responseJson) => {
+            //return fetch(url) .then((response) => {
+            return fetch(url).then((response) => {
+                return response.json()
+            }).then((responseJson) => {
 
-                    let data: any[] = [];
+                let data: any[] = [];
 
-                    for (var i = 0; i < responseJson.length; i++) {
-                        let obj = responseJson[i];
+                for (var i = 0; i < responseJson.length; i++) {
+                    let obj = responseJson[i];
 
-                        data.push({
-                            id: obj.id,
-                            name: obj.name,
-                        })
-                    }
+                    data.push({
+                        id: obj.id,
+                        name: obj.name,
+                    })
+                }
 
-                    const fileUri = FileSystem.documentDirectory + 'objtype';
-                    return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
-                })
-
-            }
+                const fileUri = FileSystem.documentDirectory + 'objtype';
+                return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
+            })
         } catch (e: any) {
             Alert.alert('ObjTypeError', e.toString());
             return Promise.reject('ObjTypeError' + e);
         }
     }
 
-    async getVidr() {
+    getVidr() {
         try {
-            return async () => {
                 const url = getUrl('vidr');
-                return await fetch(url).then((response) => {
+                return fetch(url).then((response) => {
                     return response.json()
                 }).then((responseJson) => {
 
@@ -111,93 +107,82 @@ export class HelperInit {
                     const fileUri = FileSystem.documentDirectory + 'vidr';
                     return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
                 })
-
-            }
         } catch (e: any) {
             Alert.alert('VidrError', e.toString());
             return Promise.reject('VidrError' + e);
         }
     }
 
-    async getGosts() {
+    getGosts() {
         try {
-            return async () => {
-                const url = getUrl('gost');
+            const url = getUrl('gost');
 
-                //return fetch(url) .then((response) => {
-                return await fetch(url).then((response) => {
-                    return response.json()
-                })
-                    .then((responseJson) => {
+            //return fetch(url) .then((response) => {
+            return fetch(url).then((response) => {
+                return response.json()
+            })
+                .then((responseJson) => {
 
-                        let data: any[] = [];
+                    let data: any[] = [];
 
-                        for (var i = 0; i < responseJson.length; i++) {
-                            let obj = responseJson[i];
+                    for (var i = 0; i < responseJson.length; i++) {
+                        let obj = responseJson[i];
 
-                            if (!Array.isArray(data[obj.type])) {
-                                data[obj.type] = [];
-                            }
-
-                            data[obj.type].push({
-                                id: obj.id,
-                                name: obj.name,
-                                number: obj.number,
-                            })
+                        if (!Array.isArray(data[obj.type])) {
+                            data[obj.type] = [];
                         }
 
-                        const fileUri = FileSystem.documentDirectory + 'gost';
-                        return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
-                    })
+                        data[obj.type].push({
+                            id: obj.id,
+                            name: obj.name,
+                            number: obj.number,
+                        })
+                    }
 
-            }
+                    const fileUri = FileSystem.documentDirectory + 'gost';
+                    return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data));
+                })
         } catch (e: any) {
             Alert.alert('gostError', e.toString());
             return Promise.reject('gostError' + e);
         }
     }
 
-    async getKrepl() {
+    getKrepl() {
         try {
-            return async () => {
-                const url = getUrl('krepl');
+            const url = getUrl('krepl');
 
-                return await fetch(url).then((response) => {
-                    return response.json()
-                }).then((responseJson) => {
+            return fetch(url).then((response) => {
+                return response.json()
+            }).then((responseJson) => {
 
-                    const fileUri = FileSystem.documentDirectory + 'krepl';
-                    return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
-                })
-
-            }
+                const fileUri = FileSystem.documentDirectory + 'krepl';
+                return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
+            })
         } catch (e: any) {
             Alert.alert('KreplError', e.toString());
             return Promise.reject('KreplError' + e);
         }
     }
 
-    async getTiporaz() {
+    getTiporaz() {
         try {
-            return async () => {
-                const url = getUrl('tiporaz');
+            const url = getUrl('tiporaz');
 
-                return await fetch(url).then((response) => {
-                    return response.json()
-                }).then((responseJson) => {
+            return fetch(url).then((response) => {
+                return response.json()
+            }).then((responseJson) => {
 
-                    const fileUri = FileSystem.documentDirectory + 'tiporaz';
-                    return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
-                })
-
-            }
+                const fileUri = FileSystem.documentDirectory + 'tiporaz';
+                return FileSystem.writeAsStringAsync(fileUri, JSON.stringify(responseJson));
+            })
         } catch (e: any) {
             Alert.alert('TiporazError', e.toString());
             return Promise.reject('TiporazError' + e);
         }
     }
 
-    async getRoles(Token: string) {
+    getRoles(Token: string) {
         try {
             const url = getUrl('roles');
 

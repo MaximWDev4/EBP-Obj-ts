@@ -94,7 +94,6 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 				if (
 					state
 				) {
-					console.log(body);
 					fetch(url, {
 						method: 'post',
 						headers: {
@@ -113,7 +112,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 								//Alert.alert('Res:', responseJson.msg + ' -- ' + responseJson.code );
 								Alert.alert('Ошибка:' + responseJson.code,  responseJson.msg, [
 									{
-										text: 'Вернуться на главный экран',
+										text: 'Сохранить и вернуться на главный экран',
 										onPress: () => {
 											const saveRecord = async () => {
 												let saveBefore = Data.imageBefore;
@@ -190,7 +189,7 @@ export default function ObjUpload({navigation, route}: SignDataProps) {
 						});
 					}
 					saveRecord().then(() => {
-						Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище', [
+						Alert.alert('OK', 'Отчет успешно сохранен во внутреннем хранилище' + '', [
 							{
 								text: 'Вернуться на главный экран',
 								onPress: () => navigation.dispatch(

@@ -19,11 +19,11 @@ export class GpsService {
 
     constructor() {
         Location.getForegroundPermissionsAsync().then( (a) => {
-            if (a.android?.scope == 'fine' || a.android?.scope == 'coarse') {
+            if (a.android?.scope == 'fine' || a.android?.accuracy == 'coarse') {
                 this.p = true;
             } else {
                 Location.requestForegroundPermissionsAsync().then((e) =>{
-                    this.p = (e.android?.scope == 'fine' || e.android?.scope == 'coarse')
+                    this.p = (e.android?.scope == 'fine' || e.android?.accuracy == 'coarse')
                 })
             }
         })
@@ -31,7 +31,7 @@ export class GpsService {
 
     async start() {
         this.isRunning = true;
-        const options: Location.LocationTaskOptions = {accuracy: Location.Accuracy.BestForNavigation}
+        const options: Location.LocationTaskOptions = {accuracy: Location.Accuracy.BestForNavigation, timeInterval: 3000, }
         this.watchLocation = await Location.watchPositionAsync(options, (opts) => {
             if (opts) {
                 if (opts.coords.accuracy) {
@@ -73,12 +73,10 @@ export class GpsService {
         // }
     }
 
-    // @ts-ignore
     static getGps(Gps: GPS[]) {
         return Gps[Gps?.length - 1];
     }
 
-    // @ts-ignore
     static getMin(Gps: GPS[]) {
         let min: GPS|undefined = undefined;
         let Result: GPS = {

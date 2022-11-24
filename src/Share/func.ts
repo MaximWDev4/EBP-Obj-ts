@@ -1,4 +1,4 @@
-/// <reference path="../node.d.ts"/>
+/// <reference path="../../node.d.ts"/>
 
 import {Alert} from 'react-native';
 import DB from "./storage";
@@ -10,9 +10,9 @@ import {store} from "../Store";
 const getUrl = (action: any) => {
 
     // let base = 'http://192.168.0.23:8091/'; //dev
-    let base = 'http://192.168.0.16:8095/'; //dev/prod
-    // let base = 'http://185.97.113.59:8095/'; // prod
-    // let base = 'http://217.15.180.58:8095/'; // prod 217.15.180.58
+    // let base = 'http://192.168.0.16:8095/'; //dev/prod
+    let base = 'http://185.97.113.59:8095/'; // prod
+    // let base  = 'http://192.168.0.71:8080/api/';
 
     switch (action) {
         case 'gost':
@@ -75,15 +75,15 @@ const addRecord = async (type: 'znak' | 'obj', body: string, img_old?: string[],
 }
 
 async function askPermission() {
-    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync().catch((r:any) => {Alert.alert('Ошибка при запросе разрешения', r); return {status: 'error'}});
     if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
+        Alert.alert('Необходимо разрешение', 'для работы этой функции необходимо разрешение на использование камеры.');
     }
     return status === 'granted'
 }
 
 
-const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
+const sendZnakObj = async (body: any, res: 'save' | 'saveobj'): Promise<number|null> => {
 
 
     const url = getUrl(res);
@@ -104,30 +104,23 @@ const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
                 return response.json()
             })
             .then((responseJson) => {
-                console.log(responseJson)
                 if (responseJson.code == 0) {
                     sent = responseJson.id;
-
                     //res = id;
-
                     console.log('OK');
 
                 } else {
                     Alert.alert('Error', responseJson.code + ': ' + responseJson.msg.toString());
+                    throw Error(responseJson.code + ' ' + responseJson.msg.toString() )
                 }
             })
             .catch(err => {
                 //console.log(err);
-                alert(err.toString());
-
-                sent = null;
+                throw new Error('Ошибка при отправке' + err.toString());
             })
-
-
-    } catch (e) {
-        alert(e);
+    } catch (e: any) {
+        throw new Error('Ошибка при отправке' + e.toString());
     }
-
     return sent;
 }
 
@@ -150,43 +143,34 @@ const sendZnakObj = async (body: any, res: 'save' | 'saveobj') => {
 // 	}
 // }
 
+const checkIfImagesExist = async (imgArr: string[]) => {
+    let imageExists: boolean[] = [];
+    let img;
+    try {
+        for (let i = 0; i < imgArr.length; i++) {
+            img = imgArr[i];
+            if ((await FileSystem.getInfoAsync(img).catch(() => {return {exists:false}})).exists) {
+                imageExists.push(true);
+            } else {
+                imageExists.push(false);
+            }
+        }
+        return imageExists;
+    } catch (e: any) {
+        Alert.alert('Ошибка при отправке', e.toString());
+        imageExists = [];
+        return imageExists;
+    }
 
+}
 const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'): Promise<string> => {
     const Token = store.getState().system.token;
     const img_old: string[] = record.imageBefore ?? JSON.parse(record.img_old);
     const img_new: string[] = record.imageAfter ?? JSON.parse(record.img_old);
     const url = getUrl(rout == 'znak' ? 'foto' : 'foto-obj');
     const formData = new FormData();
-    let imageExists: boolean[] = [];
-    let image2Exists: boolean[] = [];
-    let img;
-    console.log('sending phitos');
-    try {
-        for (let i = 0; i < img_old.length; i++) {
-            img = img_old[i];
-            if ((await FileSystem.getInfoAsync(img)).exists) {
-                imageExists.push(true);
-            } else {
-                imageExists.push(false);
-            }
-        }
-    } catch (e) {
-        console.log(e);
-        imageExists = [];
-    }
-    try {
-        for (let i = 0; i < img_new.length; i++) {
-            img = img_new[i];
-            if ((await FileSystem.getInfoAsync(img)).exists) {
-                image2Exists.push(true);
-            } else {
-                image2Exists.push(false);
-            }
-        }
-    } catch (e) {
-        console.log(e);
-        image2Exists = [];
-    }
+    let imageExists: boolean[] = await checkIfImagesExist(img_old);
+    let image2Exists: boolean[] = await checkIfImagesExist(img_new);
     try {
         let res: boolean | number = false;
         if (rout == 'znak') {
@@ -195,19 +179,19 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
             if (imageExists[0]) {
                 formData.append('IMG_OLD', {// @ts-ignore
                     uri: img_old[0],
-                    name: `image_old.${img_old[0].substr(img_old[0].length - 3)}`,
-                    type: `image/${img_old[0].substr(img_old[0].length - 3)}`
+                    name: `image_old.${img_old[0].substring(img_old[0].indexOf('.', img_old[0].length - 5)+1)}`,
+                    type: `image/${img_old[0].substring(img_old[0].indexOf('.', img_old[0].length - 5)+1)}`
                 });
             }
             if (image2Exists[0]) {
                 formData.append('IMG_NEW', {// @ts-ignore
                     uri: img_new[0],
-                    name: `image_new.${img_new[0].substr(img_new[0].length - 3)}`,
-                    type: `image/${img_new[0].substr(img_new[0].length - 3)}`
+                    name: `image_new.${img_new[0].substring(img_new[0].indexOf('.', img_new[0].length - 5)+1)}`,
+                    type: `image/${img_new[0].substring(img_new[0].indexOf('.', img_new[0].length - 5)+1)}`
                 });
             } else {
                 formData.append('IMG_NEW', {// @ts-ignore
-                    uri: Asset.fromModule(require('../assets/images/maintaining.png')).uri,
+                    uri: Asset.fromModule(require('../../assets/images/maintaining.png')).uri,
                     name: `image_new.maintaining.png`,
                     type: `image/maintaining.png`
                 });
@@ -228,21 +212,22 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
                             console.log(responseJson);
                             res = responseJson.code;
 
-                            if (res == 0) {
+                            if (res === 0) {
                                 let db = new DB;
                                 await db.deleteZnak(record, () => null);
                             } else {
                                 Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
+                                throw new Error(`${responseJson.code} ${responseJson.msg}`);
                             }
                         })
                         .catch(err => {
                             return err;
                         })
+                    return 'success'
                 } catch (e: any) {
                     alert(e);
                     return e
                 }
-                return 'success'
             }
         } else if (rout == 'obj') {
             console.log(imageExists);
@@ -256,8 +241,8 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
                         console.log('set1')
                         formData.append('IMG_OLD', {// @ts-ignore
                             uri: img_old[i],
-                            name: `image_old.${img_old[i].substr(img_old[i].length - 3)}`,
-                            type: `image/${img_old[i].substr(img_old[i].length - 3)}`
+                            name: `image_old.${img_old[0].substring(img_old[0].indexOf('.', img_old[0].length - 5)+1)}`,
+                            type: `image/${img_old[0].substring(img_old[0].indexOf('.', img_old[0].length - 5)+1)}`
                         });
                         formDatahas1 = true;
                     }
@@ -265,13 +250,13 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
                         console.log('set2')
                         formData.append('IMG_NEW', {// @ts-ignore
                             uri: img_new[i],
-                            name: `image_new.${img_new[i].substr(img_new[i].length - 3)}`,
-                            type: `image/${img_new[i].substr(img_new[i].length - 3)}`
+                            name: `image_new.${img_new[0].substring(img_new[0].indexOf('.', img_new[0].length - 5)+1)}`,
+                            type: `image/${img_new[0].substring(img_new[0].indexOf('.', img_new[0].length - 5)+1)}`
                         });
                         formDatahas2 = true;
                     } else {
                         formData.append('IMG_NEW', {// @ts-ignore
-                            uri: Asset.fromModule(require('../assets/images/maintaining.png')).uri,
+                            uri: Asset.fromModule(require('../../assets/images/maintaining.png')).uri,
                             name: `image_new.maintaining.png`,
                             type: `image/maintaining.png`
                         });
@@ -302,16 +287,15 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
                                         }, (s) => {
                                             console.log(s)
                                         })
-                                        return "fail"
+                                        throw new Error(`${responseJson.code}: ${responseJson.msg}`)
                                     }
                                 })
                                 .catch(err => {
                                     return err;
                                 })
                         } catch (e: any) {
-                            console.log(e);
-                            alert(e);
-                            return e
+                            Alert.alert('Error', e);
+                            return 'fail'
                         }
                     }
                 }

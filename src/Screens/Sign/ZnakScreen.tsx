@@ -50,18 +50,53 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
 
     }, [])
 
-    const next = (responseJson: any) => {
+    const next = (responseJson: any, body: any, e: any) => {
         setLoading(false);
         Data.gps = undefined;
         Data.imageBefore = undefined;
         Data.imageAfter = undefined;
         Data.qrcode = undefined;
-        Alert.alert('OK', 'Отчет успешно отправлен', [
-            {
-                text: 'Вернуться на главный экран',
-                onPress: () => navigation.getParent()?.navigate('Root')
-            }
-        ]);
+        if (responseJson.code == 0 && e == 'success') {
+            Alert.alert('OK', 'Отчет успешно отправлен', [
+                {
+                    text: 'Вернуться на главный экран',
+                    onPress: () => navigation.getParent()?.navigate('Root')
+                }
+            ]);
+        } else {
+            Alert.alert('Ошибка:' + responseJson.code, responseJson.msg + ' ' + e, [
+                {
+                    text: 'Сохранить и вернуться на главный экран',
+                    onPress: () => {
+                        const saveRecord = async () => {
+                            let saveBefore = Data.imageBefore;
+                            let saveAfter = Data.imageAfter;
+                            await addRecord('znak', body, saveBefore, saveAfter)
+                        }
+                        saveRecord().then(() => {
+                            Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+                                {
+                                    text: 'Вернуться на главный экран',
+                                    onPress: () => navigation.dispatch(
+                                        CommonActions.reset({
+                                            index: 0,
+                                            routes: [
+                                                {
+                                                    name: 'Root'
+                                                }
+                                            ]
+                                        })
+                                    )
+                                }
+                            ])
+                        });
+                    }
+                },
+                {
+                    text: 'Повторить попытку',
+                },
+            ]);
+        }
     }
 
     const sendData = () => {
@@ -111,10 +146,9 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
                             return response.json()
                         })
                         .then((responseJson) => {
-                            if (responseJson.code == 0) {
-                                sendPhoto(responseJson.id, Data, "znak").then(() => next(responseJson));
+                            if (responseJson.code === 0) {
+                                sendPhoto(responseJson.id, Data, "znak").then((e) => next(responseJson, body, e)).catch(e => {alert(e); setLoading(false)});
                             } else {
-
                                 Alert.alert('Ошибка:' + responseJson.code, responseJson.msg, [
                                     {
                                         text: 'Сохранить и вернуться на главный экран',
@@ -150,30 +184,63 @@ export default function ZnakScreen({navigation, route}: SignDataProps) {
                             }
                         })
                         .catch(err => {
-                            const saveRecord = async () => {
-                                let saveBefore = Data.imageBefore;
-                                let saveAfter = Data.imageAfter;
-                                await addRecord('znak', body, saveBefore, saveAfter)
-                            }
-                            saveRecord().then(() => {
-                                Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+                                setLoading(false);
+                                Alert.alert('Ошибка:', err.toString(), [
                                     {
-                                        text: 'Вернуться на главный экран',
-                                        onPress: () => navigation.dispatch(
-                                            CommonActions.reset({
-                                                index: 0,
-                                                routes: [
+                                        text: 'Сохранить и вернуться на главный экран',
+                                        onPress: () => {
+                                            const saveRecord = async () => {
+                                                let saveBefore = Data.imageBefore;
+                                                let saveAfter = Data.imageAfter;
+                                                await addRecord('znak', body, saveBefore, saveAfter)
+                                            }
+                                            saveRecord().then(() => {
+                                                Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
                                                     {
-                                                        name: 'Root'
+                                                        text: 'Вернуться на главный экран',
+                                                        onPress: () => navigation.dispatch(
+                                                            CommonActions.reset({
+                                                                index: 0,
+                                                                routes: [
+                                                                    {
+                                                                        name: 'Root'
+                                                                    }
+                                                                ]
+                                                            })
+                                                        )
                                                     }
-                                                ]
-                                            })
-                                        )
-                                    }
-                                ])
-                            });
+                                                ])
+                                            });
+                                        }
+                                    },
+                                    {
+                                        text: 'Повторить попытку',
+                                    },
+                                ]);
+                            // const saveRecord = async () => {
+                            //     let saveBefore = Data.imageBefore;
+                            //     let saveAfter = Data.imageAfter;
+                            //     await addRecord('znak', body, saveBefore, saveAfter)
+                            // }
+                            // saveRecord().then(() => {
+                            //     Alert.alert('OK', 'Знак успешно сохранен во внутреннем хранилище', [
+                            //         {
+                            //             text: 'Вернуться на главный экран',
+                            //             onPress: () => navigation.dispatch(
+                            //                 CommonActions.reset({
+                            //                     index: 0,
+                            //                     routes: [
+                            //                         {
+                            //                             name: 'Root'
+                            //                         }
+                            //                     ]
+                            //                 })
+                            //             )
+                            //         }
+                            //     ])
+                            // });
                             setLoading(false);
-                            Alert.alert('Непредвиденная ошибка', err.toString());
+                            // Alert.alert('Непредвиденная ошибка', err.toString());
                         })
                 } else {
                     const saveRecord = async () => {
