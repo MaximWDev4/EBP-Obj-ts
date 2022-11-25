@@ -1,16 +1,12 @@
-import React, {useEffect, useState} from "react";
+import React, { useState} from "react";
 import * as ImagePicker from "expo-image-picker";
 import {
     Button,
-    FlatList, FlatListProps,
-    GestureResponderEvent,
-    Image, ListRenderItem, Platform,
-    ScrollView,
-    StyleSheet,
+    FlatList, ListRenderItem,
     Text,
-    TouchableOpacity,
-    View
+    View, StyleSheet
 } from "react-native";
+
 // @ts-ignore
 import Spinner from 'react-native-loading-spinner-overlay';
 import {GPS} from "../Navigation/NavTypes";
@@ -83,80 +79,55 @@ type PhotoViewProps = {
 
 function RenderPhotoView(props: PhotoViewProps) {
     return (
-        <View
-            style={{
-                //flexDirection: 'column',
-
-
-                flex: 1
-            }}>
-
-
+        <View style={{height: '90%', justifyContent: 'space-between'}}>
             <View
                 style={{
 
                     //backgroundColor: 'green',
                     //justifyContent: 'space-between',
                     //justifyContent: 'flex-start',
-
-
                     //justifyContent: 'center',
-
                     padding: 5,
-                    flex: 1,
-
                 }}
             >
 
-                <View style={{height: '15%'}}>
+                <View style={{height: 'auto', flexShrink: 0}}>
 
                     <Text style={styles.header}>
 
                         { !props.after ? 'Сделать фото до:' : 'Сделать фото после:' }
-                    {/* todo */}
                     </Text>
 
                 </View>
 
                 <View style={{
-                    //paddingTop: 5,
-                    //paddingBottom: 0,
-                    height: '20%',
-                    // flex: 1,
-                    //backgroundColor: 'red',
-                    //height: 10,
+                    flexShrink: 0,
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: 10,
                 }}
                 >
                     <View style={{
-                        //paddingTop: 5,
-                        //paddingBottom: 0,
-                        flex: 1,
-                        //backgroundColor: 'red',
-                        //height: 10,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                        marginVertical: 10,
                     }}
                     >
-                        <Button
-                            title='Открыть камеру'
-
+                        <MyButton
+                            title={'Открыть камеру'}
+                            style={{color: 'white', height: 'auto', backgroundColor: '#2196f3' }}
                             onPress={() => {
                                 //fetchData(2)
                                 //takeFoto()
                                 props.pickNewImage(1)
                             }}
                         />
-                    </View>
-
-                    <View style={{
-                        paddingTop: 5,
-                        //paddingBottom: 0,
-                        flex: 1,
-                        //backgroundColor: 'red',
-                        //height: 10,
-                    }}
-                    >
-                        <Button
+                        <MyButton
                             title='Выбрать готовое фото'
-
+                            style={{color: 'white', height: 'auto', backgroundColor: '#2196f3' }}
                             onPress={() => {
                                 //fetchData(2)
                                 //ZnakFotoBeforetainZnak()
@@ -166,35 +137,29 @@ function RenderPhotoView(props: PhotoViewProps) {
                     </View>
 
                 </View>
-                <View style={{height: '60%'}}>
+                <View style={{height: 'auto', flexShrink: 1, flexGrow: 1,}}>
                     <FlatList
                         keyExtractor={item => item.toString()} data={props.im} renderItem={props.IM}
                     />
                 </View>
             </View>
             <View style={{
-                height: '15%',
-                //justifyContent: 'space-between',
-                flexDirection: 'column',
-
-                //justifyContent: 'center',
-                justifyContent: 'flex-end',
-                //backgroundColor: 'red',
-
-                //flexDirection: 'column-reverse',
-                padding: 5,
+                height: 'auto',
+                padding: 10,
+                width: '100%',
             }}>
 
-                <View style={{flex: 1}}/>
-
-
                 <View style={{
-                    flex: 1,
-                    //flexDirection: 'column-reverse',
-                    //padding: 5,
+                    flexDirection: 'column',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    alignItems: 'stretch',
+                    width: '100%',
+                    marginVertical: 10,
                 }}>
 
-                    <Button
+                    <MyButton
+                        style={{color: props.im.length ? 'white' : '#a1a1a1', height: 'auto', backgroundColor: props.im.length ? '#2196f3' : '#dfdfdf',}}
                         title='Продолжить'
                         // style={{ flex: 1,
                         // }}
@@ -203,7 +168,8 @@ function RenderPhotoView(props: PhotoViewProps) {
                             props.next();
                         }}
                     />
-                    {props.after && <Button
+                    {props.after && <MyButton
+                        style={{color: !(typeof props.im !== 'undefined' ? props.im.length > 0 : true) ? 'white' : '#a1a1a1', height: 'auto', backgroundColor: !(typeof props.im !== 'undefined' ? props.im.length > 0 : true) ? '#2196f3' : '#dfdfdf',}}
                         title='Пропустить'
                         // style={{ flex: 1,
                         // }}
@@ -214,8 +180,6 @@ function RenderPhotoView(props: PhotoViewProps) {
                     />
                     }
                 </View>
-
-                <View style={{flex: 1}}/>
 
             </View>
 
@@ -283,7 +247,7 @@ function RenderGPSView(loading: boolean,
                     }]
                 }
             />
-            <View style={{flex: 1}}>
+            <View style={{}}>
                 {selectRacc &&
                 <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', maxWidth: '100%', height: 'auto'}}>
                     <MyButton onPress={() => rAccCallback(al.high)} title={`<${al.high}м`}
@@ -326,8 +290,8 @@ function RenderGPSView(loading: boolean,
                 <TextStroke stroke={0.5} color={'#FFFFFF'}>
                     <Text onPress={() => setChAccIsVis(true)} style={{
                         textAlign: "center",
-                        height: 55,
-                        paddingBottom: 15,
+                        height: 75,
+                        padding: 15,
                         textAlignVertical: 'bottom',
                         fontSize: 22,
                         backgroundColor: '#9d9999',
@@ -336,16 +300,16 @@ function RenderGPSView(loading: boolean,
                         Целевая точность: {rAcc < 4.6 ? rAcc : '>4.5'}м.
                     </Text>
                 </TextStroke>
-                <View style={{paddingTop: 10, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{paddingTop: 10, justifyContent: 'center', alignItems: 'center'}}>
                     <Text style={[styles.text, {color: colors.gray}]}>Оценка точности</Text>
                     <Text style={[styles.text, {color: accIc(macc)}]}> {accMarck} </Text>
                 </View>
-                <View style={{flex: 1}}>
-
-                </View>
-                <View style={{flex: 1}}>
-                    <View style={{flex: 1,}}>
-                        <MyButton style={{height: 50, backgroundColor: colors.gray, fontSize: 22}} title='Продолжить'
+                <View style={{
+                    height: 'auto',
+                    padding: 10,
+                    width: '100%',}}>
+                    <View style={{}}>
+                        <MyButton style={{height: 70, backgroundColor: colors.gray, fontSize: 22}} title='Продолжить'
                                   onPress={() => {
                                       if (macc || macc === 0) {
                                           if (macc < rAcc || macc <= al.mid || (rAcc >= al.mid && macc <= al.low) || rAcc > al.low) {

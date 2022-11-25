@@ -1,2 +1,6 @@
 # EBP-Obj-ts
- React Native && typescript realisation of EBP
+ React Native + Expo && typescript realisation of EBP
+# build:
+eas build -p android --profile preview
+# run
+expo start

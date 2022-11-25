@@ -72,7 +72,7 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
                     paddingTop: 15,
                     flex: 5
                 }}>
-                    <Text style={{fontSize: 20, height: 40, textAlignVertical: 'bottom'}}>Изображение выбрано </Text>
+                    <Text style={{fontSize: 20, height: 60, textAlignVertical: 'bottom'}}>Изображение выбрано </Text>
 
 
                 </View>
@@ -102,7 +102,7 @@ export default function ZnakFotoAfterScreen({route, navigation}: SignDataProps) 
                 im: images, next: next, IM: IM, pickNewImage: (type) => pickImage(type, hasPermission, (s, result) => {
                     if (s) {
                         try {
-                            setImages([...images, result]);
+                            setImages([result]);
                         } catch (e) {
                             alert(e)
                         }

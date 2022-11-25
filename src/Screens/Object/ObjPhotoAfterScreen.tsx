@@ -151,11 +151,11 @@ const styles = StyleSheet.create({
 
     text: {
         fontSize: 20,
-        height: 40,
+        height: 60,
         textAlignVertical: 'bottom',
     },
     input: {
-        height: 40,
+        height: 60,
         backgroundColor: '#eee',
         borderColor: 'gray',
         borderWidth: 1

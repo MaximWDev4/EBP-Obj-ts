@@ -148,21 +148,20 @@ const styles = StyleSheet.create({
 
     text: {
         fontSize: 20,
-        height: 40,
+        height: 60,
         textAlignVertical: 'bottom',
     },
     input: {
-        height: 40,
+        height: 60,
         backgroundColor: '#eee',
         borderColor: 'gray',
         borderWidth: 1
     },
 
     GPSText: {
-        marginTop: -10,
         textAlign: "center",
         color: 'white',
-        height: 40,
+        height: 60,
         textAlignVertical: 'bottom',
         fontSize: 30,
     },

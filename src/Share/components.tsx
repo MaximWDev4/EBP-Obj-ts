@@ -24,6 +24,7 @@ type loadingProps = {
 
 type MyButton = {
     title?: string,
+    disabled?: boolean,
     onPress: () => any,
     style?: { height?: number | string, size?: number, backgroundColor?: string, color?: string, fontSize?: number }
 }
@@ -100,6 +101,7 @@ export const MyButton = ({
                              title = "Отмена",
                              onPress = () => {
                              },
+                             disabled = false,
                              style = {
                                  height: 'auto',
                                  size: 1,
@@ -109,7 +111,7 @@ export const MyButton = ({
                              }
                          }: MyButton) => {
     return (
-        <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={[
+        <TouchableOpacity activeOpacity={0.8} onPress={onPress} disabled={disabled} style={[
             styles.appButtonContainer,
             {
                 minHeight: 40,
@@ -118,7 +120,8 @@ export const MyButton = ({
                 flex: style.size,
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: 10
+                padding: 10,
+                width: '100%'
             },
             !!style.backgroundColor && {
                 backgroundColor: style.backgroundColor
@@ -186,11 +189,11 @@ export const CustomModalWindow = (props: alertProps) => {
         buttons = [
             {
                 title: "Отмена", onPress: () => {
-                }, style: {backgroundColor: '#8C8888', color: '#b22000', fontSize: 18, size: 2}
+                }, style: {backgroundColor: '#8C8888', color: '#b22000', fontSize: 18, size: 1}
             },
             {
                 title: "Подтвердить", onPress: () => {
-                }, style: {backgroundColor: '#8C8888', color: '#0cc213', fontSize: 18, size: 2}
+                }, style: {backgroundColor: '#8C8888', color: '#0cc213', fontSize: 18, size: 1}
             }]
     }: alertProps = props;
     let btns: any = []
@@ -223,16 +226,16 @@ export const CustomModalWindow = (props: alertProps) => {
                     <Text style={{
                         color: `${color}`,
                         paddingHorizontal: 40,
-                        paddingBottom: 20,
+                        paddingBottom: 60,
+                        flexGrow: 1,
                         fontSize: 15
                     }}>{message}</Text>
                     <View style={{
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
-                        maxHeight: 10,
-                        flexGrow: 1,
-                        flex: 1
+                        flexGrow: 0,
+                        flexShrink: 1,
                     }}>{btns}</View>
                 </View>
             </View>

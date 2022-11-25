@@ -10,8 +10,8 @@ import {store} from "../Store";
 const getUrl = (action: any) => {
 
     // let base = 'http://192.168.0.23:8091/'; //dev
-    // let base = 'http://192.168.0.16:8095/'; //dev/prod
-    let base = 'http://185.97.113.59:8095/'; // prod
+    let base = 'http://192.168.0.16:8095/'; //dev/prod
+    // let base = 'http://185.97.113.59:8095/'; // prod
     // let base  = 'http://192.168.0.71:8080/api/';
 
     switch (action) {
@@ -212,12 +212,12 @@ const sendPhoto = async (sid: string | number, record: any, rout: 'znak' | 'obj'
                             console.log(responseJson);
                             res = responseJson.code;
 
-                            if (res === 0) {
-                                let db = new DB;
-                                await db.deleteZnak(record, () => null);
-                            } else {
+                            if (+res != 0) {
                                 Alert.alert(`Error: ${responseJson.code}`, responseJson.msg)
                                 throw new Error(`${responseJson.code} ${responseJson.msg}`);
+                            } else {
+                                let db = new DB;
+                                await db.deleteZnak(record, () => null);
                             }
                         })
                         .catch(err => {
